@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Caccer Motorsports</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800;900&family=Archivo+Narrow:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a confident independent dealer in West Jordan, straight talk, out the door prices.
+   IDEA: the showroom turntable plus the window sticker you read before you buy.
+   PICTURE: each car as a live 3D model on a lit turntable, with hotspots that open the real photos.
+   COLOUR and TYPE: asphalt graphite, paper white sticker, Caccer red accent; Archivo wide for names, Archivo Narrow for specs.
+   LAYOUT: stage first, sticker beside it, the 5-car lineup as parking spots, then photos, finance, visit. */
+:root{color-scheme:light dark;
+--bg:light-dark(#f3f3f1,#0f1012);--ink:light-dark(#141518,#f2f2f0);--mute:light-dark(#5d6168,#a3a7ad);
+--card:light-dark(#ffffff,#1a1c20);--line:light-dark(#dcdcd8,#2b2e33);--red:#e3241b;--stage:#121316;--paper:#fbfaf6}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Archivo,system-ui,sans-serif;overflow-x:clip}
+a{color:inherit}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 max(4vw,16px)}
+header{background:#0b0c0e;color:#f2f2f0}
+header .wrap{display:flex;align-items:center;gap:20px;min-height:64px;flex-wrap:wrap}
+.logo{font-weight:900;letter-spacing:.02em;font-size:20px;text-decoration:none;display:flex;align-items:center;gap:10px}
+.logo i{width:28px;height:14px;background:var(--red);transform:skewX(-20deg);display:inline-block}
+.logo small{font-weight:500;color:#a3a7ad;font-size:12px}
+nav{display:flex;gap:18px;margin-left:auto;flex-wrap:wrap;align-items:center}
+nav a{text-decoration:none;color:#d6d7d9;font-size:15px}
+nav a:hover{color:#fff}
+.lang{display:flex;border:1px solid #3a3d42;border-radius:999px;overflow:hidden}
+.lang button{background:none;border:0;color:#a3a7ad;padding:8px 12px;min-height:36px}
+.lang button[aria-pressed=true]{background:#f2f2f0;color:#0b0c0e}
+
+/* stage */
+.show{background:var(--stage);color:#f2f2f0;position:relative}
+.show .wrap{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:28px;padding-top:28px;padding-bottom:28px}
+.stage{position:relative;aspect-ratio:3/2;border-radius:18px;overflow:hidden;background:#0d0e10;touch-action:pan-y;user-select:none;cursor:grab}
+.stage:active{cursor:grabbing}
+.frames img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .35s ease}
+.frames img.on{opacity:1}
+.pan{position:absolute;inset:0;overflow:hidden;opacity:0;pointer-events:none;transition:opacity .35s}
+.pan img{position:absolute;top:0;height:100%;width:auto;min-width:135%;object-fit:cover;left:0;will-change:transform}
+.stage.int .pan{opacity:1}.stage.int .frames,.stage.int #hsLayer{opacity:0;pointer-events:none}
+.stage::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,0) 28%,rgba(0,0,0,0) 72%,rgba(0,0,0,.5) 100%);pointer-events:none}
+.title,.tools,.dots,.hint,.arrow,#hsLayer{z-index:2}
+.title{position:absolute;left:22px;top:18px;right:22px;pointer-events:none;text-shadow:0 2px 14px rgba(0,0,0,.5)}
+.title p{margin:0;font:600 14px 'Archivo Narrow';color:#dfe1e4}
+.title h1{margin:2px 0 0;font-size:clamp(24px,3.4vw,42px);line-height:1.05;font-weight:900;text-wrap:balance;max-width:18ch}
+.tools{position:absolute;left:16px;bottom:16px;display:flex;gap:8px;flex-wrap:wrap}
+.tools button{background:rgba(20,21,24,.78);color:#f2f2f0;border:1px solid #3a3d42;border-radius:999px;padding:10px 16px;min-height:44px;backdrop-filter:blur(6px)}
+.tools button[aria-pressed=true]{background:#f2f2f0;color:#111}
+.arrow{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:0;background:rgba(15,16,18,.7);color:#fff;font-size:24px;line-height:1}
+.arrow.l{left:12px}.arrow.r{right:12px}
+.stage.int .arrow{display:none}
+.dots{position:absolute;right:18px;bottom:24px;display:flex;gap:6px}
+.dots i{width:22px;height:4px;border-radius:2px;background:rgba(255,255,255,.35)}
+.dots i.on{background:var(--red)}
+.hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(10,11,12,.72);padding:10px 16px;border-radius:999px;font:600 14px 'Archivo Narrow';color:#fff;pointer-events:none;transition:opacity .5s}
+.hint.gone{opacity:0}
+.hs{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;gap:8px;background:none;border:0;padding:6px;color:#fff;transition:opacity .25s}
+.hs b{width:24px;height:24px;border-radius:50%;background:var(--red);box-shadow:0 0 0 6px rgba(227,36,27,.3);display:grid;place-items:center;font-size:15px;line-height:1;animation:pulse 2.2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 11px rgba(227,36,27,.12)}}
+.hs span{background:rgba(12,13,15,.88);padding:5px 10px;border-radius:8px;font:600 13px 'Archivo Narrow';white-space:nowrap}
+.hs.off{opacity:0;pointer-events:none}
+@media(max-width:600px){.hs span{display:none}.arrow{display:none}.title h1{font-size:22px}}
+/* sticker */
+.sticker{background:var(--paper);color:#141518;border-radius:14px;padding:22px 22px 20px;align-self:start;position:relative;
+box-shadow:0 24px 60px rgba(0,0,0,.45);border-top:10px solid var(--red)}
+.sticker .lbl{font:700 13px 'Archivo Narrow';color:#5d6168;margin:0}
+.price{font-size:clamp(44px,5vw,58px);font-weight:900;line-height:1;margin:6px 0 4px;letter-spacing:-.02em;white-space:nowrap}
+.otd{font:600 14px 'Archivo Narrow';color:#3a3d42;margin:0 0 14px}
+.specs{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #dcdcd8;margin:0}
+.specs div{padding:10px 0;border-bottom:1px solid #dcdcd8}
+.specs div:nth-child(odd){padding-right:10px;border-right:1px solid #dcdcd8}
+.specs div:nth-child(even){padding-left:12px}
+.specs dt{font:600 12px 'Archivo Narrow';color:#6b6f75}
+.specs dd{margin:0;font-weight:700;font-size:16px}
+.cta{display:grid;gap:8px;margin-top:16px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border-radius:10px;font-weight:700;text-decoration:none;border:0;padding:0 16px}
+.btn.red{background:var(--red);color:#fff}
+.btn.ghost{background:#ececE8;color:#141518}
+.fine{font-size:13px;color:#5d6168;margin:12px 0 0;line-height:1.4}
+
+/* lineup */
+.lineup{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;padding-bottom:30px}
+.spot{background:#1a1c20;border:1px solid #2b2e33;border-radius:12px;padding:0 0 12px;color:#f2f2f0;text-align:left;overflow:hidden;position:relative}
+.spot img{width:100%;aspect-ratio:3/2;object-fit:cover;display:block;filter:saturate(.9)}
+.spot b{display:block;padding:10px 12px 0;font-size:15px;line-height:1.2}
+.spot span{display:block;padding:2px 12px 0;font:700 17px 'Archivo Narrow';color:#ff5a4f}
+.spot[aria-current=true]{border-color:var(--red);box-shadow:0 0 0 2px var(--red)}
+.spot[aria-current=true]::after{content:"";position:absolute;left:12px;right:12px;bottom:0;height:4px;background:var(--red);border-radius:4px 4px 0 0}
+
+/* detail */
+.band{padding:clamp(32px,5vw,64px) 0}
+h2{font-size:clamp(28px,3.4vw,40px);line-height:1.05;margin:0 0 18px;font-weight:900;text-wrap:balance}
+.detail{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:36px}
+.gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.gallery button{border:0;padding:0;border-radius:10px;overflow:hidden;background:#222;aspect-ratio:3/2}
+.gallery button:first-child{grid-column:span 3;aspect-ratio:16/9}
+.gallery img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+.gallery button:hover img{transform:scale(1.04)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px;padding:0;list-style:none}
+.chips li{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font:600 14px 'Archivo Narrow'}
+.feat{columns:1;margin:0;padding:0;list-style:none}
+.feat li{padding:9px 0 9px 22px;border-bottom:1px solid var(--line);position:relative;font-size:15px}
+.feat li::before{content:"";position:absolute;left:2px;top:17px;width:10px;height:3px;background:var(--red)}
+
+/* finance */
+.fin{background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.calc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:36px;align-items:center}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:grid;gap:6px;font:600 14px 'Archivo Narrow';color:var(--mute)}
+input,select{font:16px Archivo,sans-serif;min-height:46px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 12px;width:100%}
+.monthly{font-size:clamp(48px,7vw,84px);font-weight:900;line-height:1;letter-spacing:-.03em;white-space:nowrap}
+.monthly small{font-size:.32em;font-weight:600;color:var(--mute);letter-spacing:0}
+
+/* why */
+.why{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.why div{border-top:4px solid var(--red);padding-top:12px}
+.why b{display:block;font-size:18px;margin-bottom:4px}
+.why p{margin:0;color:var(--mute);font-size:15px}
+.visit{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:center;background:#0b0c0e;color:#f2f2f0;border-radius:18px;padding:clamp(22px,4vw,40px);margin-top:40px}
+.visit h2{margin:0 0 6px}
+.visit p{margin:0;color:#b9bcc1}
+footer{padding:28px 0 40px;color:var(--mute);font-size:14px}
+
+.btn.dark{background:#141518;color:#fff}
+.mbar{display:none}
+.md{position:fixed;inset:0;background:rgba(5,6,7,.7);display:none;place-items:center;z-index:60;padding:14px}
+.md.open{display:grid}
+.mdbox{background:var(--paper);color:#141518;border-radius:16px;width:100%;max-width:480px;padding:18px;display:grid;gap:12px;border-top:8px solid var(--red)}
+.mdhead{display:flex;justify-content:space-between;align-items:center;font-size:18px}
+.mdhead .x{background:#ececE8;border:0;border-radius:999px;width:44px;height:44px;font-size:22px}
+.mdcar{display:flex;gap:12px;align-items:center}
+.mdcar img{width:96px;aspect-ratio:3/2;object-fit:cover;border-radius:8px}
+.mdcar b{display:block;line-height:1.2}.mdcar span{font:700 18px 'Archivo Narrow';color:var(--red)}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:#ececE8;border-radius:12px;padding:4px}
+.seg button{border:0;background:none;min-height:42px;border-radius:9px;font-weight:700;color:#5d6168}
+.seg button[aria-pressed=true]{background:#fff;color:#141518;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.mdbox label{color:#5d6168}
+.mdbox textarea{font:16px/1.45 Archivo,sans-serif;border:1px solid #dcdcd8;border-radius:10px;padding:10px 12px;background:#fff;color:#141518;resize:vertical;width:100%}
+.mdbox .fine{margin:0}
+/* lightbox */
+.lb{position:fixed;inset:0;background:rgba(5,6,7,.94);display:none;z-index:50;color:#fff}
+.lb.open{display:grid;grid-template-rows:auto minmax(0,1fr) auto}
+.lb header{background:none;display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+.lb header b{font-size:17px}
+.lb .x{background:#222;border:0;color:#fff;border-radius:999px;width:44px;height:44px;font-size:22px}
+.lb figure{margin:0;display:grid;place-items:center;padding:0 56px;position:relative}
+.lb figure img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
+.lb .nav{position:absolute;top:50%;transform:translateY(-50%);background:#222;border:0;color:#fff;width:44px;height:44px;border-radius:50%;font-size:20px}
+.lb .prev{left:6px}.lb .next{right:6px}
+.lb .strip{display:flex;gap:6px;overflow-x:auto;padding:12px 16px}
+.lb .strip button{flex:none;border:2px solid transparent;padding:0;border-radius:6px;overflow:hidden;width:86px;height:58px;background:none}
+.lb .strip button[aria-current=true]{border-color:var(--red)}
+.lb .strip img{width:100%;height:100%;object-fit:cover}
+
+@media(max-width:960px){
+ .show .wrap{grid-template-columns:minmax(0,1fr)}
+ .lineup{grid-template-columns:repeat(5,minmax(150px,1fr));overflow-x:auto;scroll-snap-type:x mandatory}
+ .spot{scroll-snap-align:start}
+ .detail,.calc{grid-template-columns:minmax(0,1fr)}
+ .why{grid-template-columns:1fr 1fr}
+}
+ @media(max-width:600px){
+ nav a{display:none}
+ .fields{grid-template-columns:1fr}
+ .why{grid-template-columns:1fr}
+ .visit{grid-template-columns:1fr}
+ .lb figure{padding:0 8px}.lb .nav{top:auto;bottom:-52px}
+}
+@media(max-width:600px){.logo small{display:none}.mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;background:#0b0c0e;color:#fff;padding:10px 14px calc(10px + env(safe-area-inset-bottom));gap:12px;align-items:center;justify-content:space-between;box-shadow:0 -6px 20px rgba(0,0,0,.35)}
+.mbar b{display:block;font-size:14px;line-height:1.2}.mbar span{font:700 17px 'Archivo Narrow';color:#ff5a4f}.mbar .btn{flex:none}footer{padding-bottom:110px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+ <a class="logo" href="#inventario"><i></i>CACCER MOTORSPORTS<small>West Jordan, UT</small></a>
+ <nav>
+  <a href="#inventario" data-es="Inventario" data-en="Inventory">Inventario</a>
+  <a href="#financiar" data-es="Financiamiento" data-en="Financing">Financiamiento</a>
+  <a href="#visitar" data-es="Visitanos" data-en="Visit us">Visitanos</a>
+  <div class="lang" role="group" aria-label="Idioma"><button id="l-es" aria-pressed="true">ES</button><button id="l-en" aria-pressed="false">EN</button></div>
+ </nav>
+</div></header>
+
+<section class="show" id="inventario">
+ <div class="wrap">
+  <div class="stage" id="stage">
+   <div class="frames" id="frames"></div>
+   <div class="pan" id="pan"><img id="panImg" alt="" draggable="false"></div>
+   <div class="title"><p id="cYear"></p><h1 id="cName"></h1></div>
+   <div id="hsLayer"></div>
+   <button class="arrow l" id="prevF" aria-label="Girar a la izquierda">‹</button>
+   <button class="arrow r" id="nextF" aria-label="Girar a la derecha">›</button>
+   <div class="tools">
+    <button id="tExt" aria-pressed="true" data-es="Exterior" data-en="Exterior">Exterior</button>
+    <button id="tInt" aria-pressed="false" data-es="Interior" data-en="Interior">Interior</button>
+    <button id="tspin" aria-pressed="false" data-es="Girar" data-en="Spin">Girar</button>
+   </div>
+   <div class="dots" id="dots"></div>
+   <div class="hint" id="hint" data-es="Arrastrá para girar el auto" data-en="Drag to turn the car">Arrastrá para girar el auto</div>
+  </div>
+  <aside class="sticker" aria-live="polite">
+   <p class="lbl" data-es="Precio final, todo incluido" data-en="Out the door price">Precio final, todo incluido</p>
+   <div class="price" id="cPrice"></div>
+   <p class="otd" data-es="Incluye taxes, doc fees, título y registración" data-en="Includes taxes, doc fees, title and registration">Incluye taxes, doc fees, título y registración</p>
+   <dl class="specs" id="cSpecs"></dl>
+   <div class="cta">
+    <button class="btn red" data-msg="interes" data-es="Me interesa este auto" data-en="I'm interested in this car">Me interesa este auto</button>
+    <button class="btn dark" data-msg="cita" data-es="Quiero una cita para verlo" data-en="Book a visit to see it">Quiero una cita para verlo</button>
+    <button class="btn ghost" id="openAll"></button>
+   </div>
+   <p class="fine" data-es="Financiamiento y garantía disponibles. Aceptamos trade-ins." data-en="Finance and warranty available. Trade-ins welcome.">Financiamiento y garantía disponibles. Aceptamos trade-ins.</p>
+  </aside>
+ </div>
+ <div class="wrap"><div class="lineup" id="lineup" role="list"></div></div>
+</section>
+
+<section class="band"><div class="wrap detail">
+ <div class="gallery" id="gallery"></div>
+ <div>
+  <h2 id="dTitle"></h2>
+  <ul class="chips" id="chips"></ul>
+  <ul class="feat" id="feat"></ul>
+ </div>
+</div></section>
+
+<section class="band fin" id="financiar"><div class="wrap calc">
+ <div>
+  <h2 data-es="¿Cuánto pagarías por mes?" data-en="What would your monthly be?">¿Cuánto pagarías por mes?</h2>
+  <div class="fields">
+   <label><span data-es="Precio (OTD)" data-en="Price (OTD)">Precio (OTD)</span><input id="fPrice" type="number" inputmode="decimal" min="0" step="100"></label>
+   <label><span data-es="Enganche" data-en="Down payment">Enganche</span><input id="fDown" type="number" inputmode="decimal" min="0" step="100" value="3000"></label>
+   <label><span data-es="Tasa anual (APR %)" data-en="APR %">Tasa anual (APR %)</span><input id="fApr" type="number" inputmode="decimal" min="0" step="0.1" value="9.9"></label>
+   <label><span data-es="Plazo" data-en="Term">Plazo</span><select id="fTerm"><option value="36">36</option><option value="48">48</option><option value="60" selected>60</option><option value="72">72</option></select></label>
+  </div>
+ </div>
+ <div>
+  <div class="monthly" id="fOut">$0<small data-es=" /mes" data-en=" /mo"> /mes</small></div>
+  <p class="fine" data-es="Estimado solamente. La tasa final depende de la aprobación de crédito." data-en="Estimate only. Final rate depends on credit approval.">Estimado solamente. La tasa final depende de la aprobación de crédito.</p>
+ </div>
+</div></section>
+
+<section class="band" id="visitar"><div class="wrap">
+ <div class="why">
+  <div><b data-es="Precio final real" data-en="Real out the door price">Precio final real</b><p data-es="El precio publicado ya incluye taxes, fees, título y registración." data-en="The posted price already includes taxes, fees, title and registration.">El precio publicado ya incluye taxes, fees, título y registración.</p></div>
+  <div><b data-es="Financiamiento y garantía" data-en="Finance and warranty">Financiamiento y garantía</b><p data-es="Opciones de crédito y garantía extendida disponibles." data-en="Credit options and extended warranty available.">Opciones de crédito y garantía extendida disponibles.</p></div>
+  <div><b data-es="Trade-ins" data-en="Trade-ins">Trade-ins</b><p data-es="Aceptamos tu vehículo como parte de pago." data-en="We take your vehicle as part of the payment.">Aceptamos tu vehículo como parte de pago.</p></div>
+  <div><b data-es="Envíos" data-en="Shipping">Envíos</b><p data-es="Enviamos tu auto fuera de Utah." data-en="We ship your car outside Utah.">Enviamos tu auto fuera de Utah.</p></div>
+ </div>
+ <div class="visit">
+  <div><h2 data-es="Solo con cita, de 9am a 7pm" data-en="By appointment, 9am to 7pm">Solo con cita, de 9am a 7pm</h2>
+  <p data-es="West Jordan, Utah. Escribinos por Instagram y te mostramos el auto en persona." data-en="West Jordan, Utah. Message us on Instagram and we will show you the car in person.">West Jordan, Utah. Escribinos por Instagram y te mostramos el auto en persona.</p></div>
+  <button class="btn red" data-msg="cita">@caccer.motorsports</button>
+ </div>
+</div></section>
+<footer><div class="wrap">Caccer Motorsports® · West Jordan, UT · <span data-es="Todas las fotos son del vehículo real a la venta." data-en="Every photo shows the actual vehicle for sale.">Todas las fotos son del vehículo real a la venta.</span></div></footer>
+
+<div class="mbar" id="mbar"><div><b id="mbName"></b><span id="mbPrice"></span></div><button class="btn red" data-msg="interes" data-es="Escribir a Santi" data-en="Message Santi">Escribir a Santi</button></div>
+<div class="md" id="md" role="dialog" aria-modal="true" aria-labelledby="mdT"><div class="mdbox">
+ <div class="mdhead"><b id="mdT"></b><button class="x" id="mdX" aria-label="Cerrar">×</button></div>
+ <div class="mdcar"><img id="mdImg" alt=""><div><b id="mdCar"></b><span id="mdPrice"></span></div></div>
+ <div class="seg" role="group"><button data-k="interes" data-es="Me interesa" data-en="I'm interested">Me interesa</button><button data-k="cita" data-es="Quiero una cita" data-en="Book a visit">Quiero una cita</button></div>
+ <label><span data-es="Tu mensaje (lo podés cambiar)" data-en="Your message (you can edit it)">Tu mensaje (lo podés cambiar)</span><textarea id="mdText" rows="5"></textarea></label>
+ <a class="btn red" id="mdGo" target="_blank" rel="noopener" href="https://ig.me/m/caccer.motorsports" data-es="Copiar mensaje y abrir Instagram" data-en="Copy message and open Instagram">Copiar mensaje y abrir Instagram</a>
+ <p class="fine" id="mdTip" data-es="Se abre el chat con @caccer.motorsports. Mantené apretado el cuadro de texto, tocá Pegar y mandalo." data-en="The chat with @caccer.motorsports opens. Long press the text box, tap Paste and send.">Se abre el chat con @caccer.motorsports. Mantené apretado el cuadro de texto, tocá Pegar y mandalo.</p>
+</div></div>
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Fotos">
+ <header><b id="lbT"></b><button class="x" id="lbX" aria-label="Cerrar">×</button></header>
+ <figure><button class="nav prev" id="lbP" aria-label="Anterior">‹</button><img id="lbI" alt=""><button class="nav next" id="lbN" aria-label="Siguiente">›</button></figure>
+ <div class="strip" id="lbS"></div>
+</div>
+
+<script>
+{
+const CARS=[
+ {id:'trx',year:'2021',make:'Ram',name:'1500 TRX 4x4',price:42900,miles:154000,body:'truck',color:0x1d3fae,wheel:0.48,lift:0.12,
+  specs:{es:[['Millas','154,000'],['Título','Clean'],['Motor','6.2L V8 Supercharged'],['Potencia','702 HP'],['Tracción','4x4 HI/LO'],['Ruedas','22" Fuel + 35"']],en:[['Miles','154,000'],['Title','Clean'],['Engine','6.2L V8 Supercharged'],['Power','702 HP'],['Drive','4x4 HI/LO'],['Wheels','22" Fuel + 35"']]},
+  chips:{es:['Hellcat 702 HP','Bilstein Blackhawk e2','Techo panorámico','Head-up display','Cámara 360','Asientos ventilados'],en:['Hellcat 702 HP','Bilstein Blackhawk e2','Panoramic roof','Head-up display','360 camera','Cooled seats']},
+  hs:{motor:[74,44],interior:[55,31],asientos:[32,31]},photos:{ext:['trx_01','trx_02','trx_03','trx_04'],motor:['trx_05'],interior:['trx_06'],asientos:['trx_10']},
+  feat:{en:['6.2L Supercharged V8 SRT Hellcat engine, 702 HP / 650 lb-ft','4x4 HI/LO range and locking differential','TRX multi-terrain modes and Launch Control','Technology, Advanced Safety, Level 2 and Bed Utility groups','22" Fuel Rebel 6 wheels with 35" all-terrain tires','Bilstein Blackhawk e2 active shocks with remote reservoirs','TRX dual exhaust','Harman Kardon 12" touchscreen, wireless CarPlay and Android, 19 speakers','Remote start and head-up display','360 surround view, front and rear park assist','Adaptive cruise with stop and go, blind spot, lane keep','Dual full panoramic sunroof','Carbon fiber interior package','Cooled and heated leather sport bucket seats','Addictive Desert Designs PRO bumpers with skid plate','Rigid LED bars, adaptive LED headlights','Towing package with brake controller and trailer reverse steering','TRX power steps, Mopar bed liner'],es:["Motor V8 6.2L Supercharged SRT Hellcat, 702 HP / 650 lb-ft", "4x4 con rango alto y bajo y diferencial bloqueable", "Modos TRX multiterreno y Launch Control", "Paquetes Technology, Advanced Safety, Level 2 y Bed Utility", "Rines Fuel Rebel 6 de 22\" con gomas all-terrain de 35\"", "Amortiguadores activos Bilstein Blackhawk e2 con reservorio", "Escape doble TRX", "Pantalla Harman Kardon de 12\", CarPlay y Android inalámbrico, 19 parlantes", "Arranque remoto y head-up display", "Cámara 360 y sensores de estacionamiento adelante y atrás", "Crucero adaptativo stop and go, punto ciego, asistente de carril", "Doble techo panorámico", "Paquete interior de fibra de carbono", "Asientos deportivos de cuero ventilados y calefaccionados", "Paragolpes Addictive Desert Designs PRO con cubrecárter", "Barras LED Rigid y faros LED adaptativos", "Paquete de remolque con control de frenos y asistente de reversa", "Estribos eléctricos TRX y protector de caja Mopar"]}},
+ {id:'velar',year:'2018',make:'Land Rover',name:'Range Rover Velar P250 R-Dynamic',price:15900,miles:88000,body:'suv',color:0x0e0f12,wheel:0.38,lift:0,sleek:true,
+  specs:{es:[['Millas','88,000'],['Título','Clean, 2 dueños'],['Motor','2.0L Turbo'],['Potencia','247 HP / 27 MPG'],['Tracción','AWD'],['Ruedas','20" Gloss Black']],en:[['Miles','88,000'],['Title','Clean, 2 owners'],['Engine','2.0L Turbo'],['Power','247 HP / 27 MPG'],['Drive','AWD'],['Wheels','20" Gloss Black']]},
+  chips:{es:['Techo panorámico','Meridian 10.25"','Cámara 360','Asientos ventilados','Portón eléctrico','Modo nieve'],en:['Panoramic roof','Meridian 10.25"','360 camera','Cooled seats','Power liftgate','Snow mode']},
+  hs:{motor:[30,44],interior:[48,26],asientos:[72,28]},photos:{ext:['velar_01','velar_02','velar_03'],motor:['velar_05'],interior:['velar_07'],asientos:['velar_08','velar_09','velar_10']},
+  feat:{en:['2.0L turbo engine, 247 HP, 27 MPG','AWD with snow, sport, comfort, eco and terrain modes','20" gloss black wheels with new all-season tires','Dual exhaust','Adaptive cruise, blind spot, lane keep, forward collision alert','Hands-free power liftgate','Full panoramic roof','Meridian surround 10.25" touchscreen with CarPlay and Android','Back-up camera, 360 view and parking sensors','Power heated leather steering wheel and paddle shifters','Cooled and heated leather seats','Adaptive LED headlights and fog lights','Ceramic tinted windows','Folding second row'],es:["Motor 2.0L turbo, 247 HP, 27 MPG", "AWD con modos nieve, sport, confort, eco y terreno", "Rines negros brillantes de 20\" con gomas all-season nuevas", "Escape doble", "Crucero adaptativo, punto ciego, asistente de carril, alerta de choque", "Portón trasero eléctrico manos libres", "Techo panorámico completo", "Sonido Meridian con pantalla de 10.25\", CarPlay y Android", "Cámara de reversa, vista 360 y sensores", "Volante de cuero calefaccionado eléctrico con paletas de cambio", "Asientos de cuero ventilados y calefaccionados", "Faros LED adaptativos y antiniebla", "Vidrios polarizados cerámicos", "Segunda fila abatible"]}},
+ {id:'rav4',year:'2017',make:'Toyota',name:'RAV4 LE AWD',price:13900,miles:145000,body:'suv',color:0xa7abb1,wheel:0.35,lift:0,
+  specs:{es:[['Millas','145,000'],['Título','Clean'],['Motor','2.5L 4 cil.'],['Consumo','29 MPG'],['Tracción','AWD con bloqueo'],['Extras','Batería y frenos nuevos']],en:[['Miles','145,000'],['Title','Clean'],['Engine','2.5L 4 cyl'],['Economy','29 MPG'],['Drive','AWD with lock'],['Extras','New battery and brakes']]},
+  chips:{es:['Crucero adaptativo','Punto ciego','JBL 9" con navegador','Volante calefaccionado','Frenos nuevos','Batería nueva'],en:['Adaptive cruise','Blind spot','JBL 9" with navigation','Heated wheel','New brakes','New battery']},
+  hs:{interior:[42,31]},photos:{ext:['rav4_01','rav4_02'],interior:['rav4_06']},
+  feat:{en:['2.5L 4 cylinder, 29 MPG','Eco and sport driving modes','AWD with center lock differential','17" alloy wheels with all-season tires','Adaptive cruise, blind spot, lane keep, downhill assist, forward collision alert','JBL 9" multimedia with navigation, Bluetooth, USB, AUX','Back-up camera','Heated leather multifunction steering wheel','LED headlights, tinted windows','Toyota all-weather floor mats','New battery and new brakes'],es:["Motor 2.5L 4 cilindros, 29 MPG", "Modos de manejo eco y sport", "AWD con bloqueo de diferencial central", "Rines de aleación de 17\" con gomas all-season", "Crucero adaptativo, punto ciego, asistente de carril, asistente de bajada, alerta de choque", "Pantalla JBL de 9\" con navegador, Bluetooth, USB y AUX", "Cámara de reversa", "Volante de cuero calefaccionado multifunción", "Faros LED y vidrios polarizados", "Alfombras Toyota para todo clima", "Batería nueva y frenos nuevos"]}},
+ {id:'crv',year:'2008',make:'Honda',name:'CR-V EX AWD',price:13900,miles:69000,body:'suv',color:0x15171b,wheel:0.34,lift:0,boxy:true,
+  specs:{es:[['Millas','69,000 originales'],['Título','Clean, sin accidentes'],['Motor','2.4L i-VTEC K24'],['Potencia','166 HP'],['Tracción','AWD'],['Ruedas','17" + gomas nuevas']],en:[['Miles','69,000 original'],['Title','Clean, no accidents'],['Engine','2.4L i-VTEC K24'],['Power','166 HP'],['Drive','AWD'],['Wheels','17" + new tires']]},
+  chips:{es:['Solo 69k millas','Sonido Bose','Sunroof','Barras de techo','Gomas nuevas','Sin accidentes'],en:['Only 69k miles','Bose sound','Sunroof','Roof racks','New tires','No accidents']},
+  hs:{interior:[60,30],asientos:[25,30],carga:[11,44]},photos:{ext:['crv_01','crv_02'],interior:['crv_06'],asientos:['crv_08','crv_09'],carga:['crv_10']},
+  feat:{en:['69,000 original miles','2.4L i-VTEC 4 cylinder (K24), 166 HP','AWD, great in winter','17" premium wheels with new all-season tires','Bose premium sound with Bluetooth, USB, AUX','Leather wrapped multifunction steering wheel','Power tilt and slide moonroof','All-weather floor mats, tinted windows','Roof racks'],es:["69,000 millas originales", "Motor 2.4L i-VTEC 4 cilindros (K24), 166 HP", "AWD, ideal para el invierno", "Rines premium de 17\" con gomas all-season nuevas", "Sonido premium Bose con Bluetooth, USB y AUX", "Volante de cuero multifunción", "Sunroof eléctrico", "Alfombras para todo clima y vidrios polarizados", "Barras de techo"]}},
+ {id:'f150',year:'2013',make:'Ford',name:'F-150 XLT 4x4 Long Bed',price:14900,miles:142000,body:'truck',color:0xe9ebee,wheel:0.47,lift:0.1,longbed:true,
+  specs:{es:[['Millas','142,000'],['Título','Clean'],['Motor','5.0L V8 Coyote'],['Potencia','370 HP'],['Tracción','4x4 HI/LO'],['Caja','6.5 ft larga']],en:[['Miles','142,000'],['Title','Clean'],['Engine','5.0L V8 Coyote'],['Power','370 HP'],['Drive','4x4 HI/LO'],['Bed','6.5 ft long']]},
+  chips:{es:['Lift 3"','35" all-terrain','Escape Flowmaster','Parrilla estilo Raptor','Subwoofer Cerwin Vega','Frenos nuevos'],en:['3" lift','35" all-terrain','Flowmaster exhaust','Raptor style grille','Cerwin Vega sub','New brakes']},
+  hs:{motor:[24,36],interior:[39,28],asientos:[62,29],audio:[76,44]},photos:{ext:['f150_01','f150_03'],motor:['f150_05'],interior:['f150_06'],asientos:['f150_08'],audio:['f150_11']},
+  feat:{en:['5.0L V8 Coyote, 370 HP','4x4 HI/LO with locking differential','6.5 ft long bed','Flowmaster dual cat-back exhaust','17" Fuel off-road wheels with 35" all-terrain tires','3" Rough Country lift kit','Raptor style grille with amber pod lights','Pioneer 7" touchscreen with CarPlay and Android, navigation','Cerwin Vega 10" powered subwoofer with amp kit','Back-up camera, downhill assist','Power seats, leather wrapped wheel','Spec-D LED headlights and fog lights','Running boards, towing package and brake controller','Brand new high-performance brakes'],es:["Motor V8 Coyote 5.0L, 370 HP", "4x4 con rango alto y bajo y diferencial bloqueable", "Caja larga de 6.5 pies", "Escape doble Flowmaster cat-back", "Rines Fuel off-road de 17\" con gomas all-terrain de 35\"", "Lift kit Rough Country de 3\"", "Parrilla estilo Raptor con luces ámbar", "Pantalla Pioneer de 7\" con CarPlay, Android y navegador", "Subwoofer Cerwin Vega de 10\" con amplificador", "Cámara de reversa y asistente de bajada", "Asientos eléctricos y volante de cuero", "Faros LED Spec-D y antiniebla", "Estribos, paquete de remolque y control de frenos", "Frenos nuevos de alto rendimiento"]}}
+];
+const PARTS={ext:{es:'Exterior',en:'Exterior'},motor:{es:'Motor',en:'Engine'},interior:{es:'Interior y tablero',en:'Interior and dash'},asientos:{es:'Asientos',en:'Seats'},carga:{es:'Maletero',en:'Cargo'},audio:{es:'Audio',en:'Audio'}};
+let lang='es',cur=0,frame=0,mode='ext';
+try{const saved=localStorage.getItem('caccer-lang');lang=saved||((navigator.language||'es').toLowerCase().startsWith('es')?'es':'en');}catch(e){lang=(navigator.language||'es').toLowerCase().startsWith('es')?'es':'en';}
+{const h=location.hash.slice(1);const i=CARS.findIndex(c=>c.id===h);if(i>=0)cur=i;}
+const $=id=>document.getElementById(id);
+const money=n=>'$'+Math.round(n).toLocaleString('en-US');
+const img=n=>'img/'+n+'.jpg';
+const allPhotos=c=>Object.values(c.photos).flat();
+const stage=$('stage');
+
+function setLang(l){lang=l;document.documentElement.lang=l;try{localStorage.setItem('caccer-lang',l);}catch(e){}
+ $('l-es').setAttribute('aria-pressed',l==='es');$('l-en').setAttribute('aria-pressed',l==='en');
+ document.querySelectorAll('[data-es]').forEach(e=>{if(e.firstChild&&e.firstChild.nodeType===3&&e.children.length===0)e.textContent=e.dataset[l];else if(!e.children.length)e.textContent=e.dataset[l];});
+ render(false);if($('md').classList.contains('open'))fillMsg();}
+$('l-es').onclick=()=>setLang('es');$('l-en').onclick=()=>setLang('en');
+
+function render(newCar=true){const c=CARS[cur];
+ $('cYear').textContent=c.year+' '+c.make;$('cName').textContent=c.name;$('cPrice').textContent=money(c.price);$('mbName').textContent=c.year+' '+c.make+' '+c.name;$('mbPrice').textContent=money(c.price);
+ $('cSpecs').innerHTML=c.specs[lang].map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+ $('openAll').textContent=(lang==='es'?'Ver las ':'See all ')+allPhotos(c).length+(lang==='es'?' fotos':' photos');
+ $('lineup').innerHTML=CARS.map((k,i)=>`<button class="spot" role="listitem" data-i="${i}" aria-current="${i===cur}"><img src="${img(k.photos.ext[0])}" alt="" loading="lazy"><b>${k.year} ${k.make} ${k.name}</b><span>${money(k.price)}</span></button>`).join('');
+ const ph=allPhotos(c);
+ $('gallery').innerHTML=ph.slice(0,7).map((p,i)=>`<button data-p="${i}" aria-label="Foto ${i+1}"><img src="${img(p)}" alt="${c.make} ${c.name}" loading="lazy"></button>`).join('');
+ $('dTitle').textContent=c.year+' '+c.make+' '+c.name;
+ $('chips').innerHTML=c.chips[lang].map(t=>`<li>${t}</li>`).join('');
+ $('feat').innerHTML=c.feat[lang].map(t=>`<li>${t}</li>`).join('');
+ if(newCar){$('fPrice').value=c.price;calc();
+  $('frames').innerHTML=c.photos.ext.map((p,i)=>`<img src="${img(p)}" alt="${c.year} ${c.make} ${c.name}" draggable="false" class="${i===0?'on':''}">`).join('');
+  $('dots').innerHTML=c.photos.ext.map((p,i)=>`<i class="${i===0?'on':''}"></i>`).join('');
+  frame=0;$('panImg').src=img(c.photos.interior[0]);panX=0.5;setPan();setMode('ext');
+  $('tInt').disabled=!c.photos.interior;}
+ $('hsLayer').innerHTML=Object.entries(c.hs).filter(([k])=>c.photos[k]).map(([k,[x,y]])=>`<button class="hs" data-k="${k}" style="left:${x}%;top:${y}%" aria-label="${PARTS[k][lang]}"><b>+</b><span>${PARTS[k][lang]} · ${c.photos[k].length}</span></button>`).join('');
+ showFrame(frame);
+}
+$('lineup').addEventListener('click',e=>{const b=e.target.closest('.spot');if(!b)return;cur=+b.dataset.i;stopSpin();render();history.replaceState(null,'','#'+CARS[cur].id);
+ if(innerWidth<960)stage.scrollIntoView({behavior:'smooth',block:'center'});});
+$('gallery').addEventListener('click',e=>{const b=e.target.closest('button');if(b)openLB(allPhotos(CARS[cur]),+b.dataset.p,'');});
+$('openAll').onclick=()=>openLB(allPhotos(CARS[cur]),0,'');
+$('hsLayer').addEventListener('click',e=>{const b=e.target.closest('.hs');if(!b)return;const c=CARS[cur],k=b.dataset.k;
+ openLB(c.photos[k],0,c.make+' '+c.name+' · '+PARTS[k][lang]);});
+
+/* exterior spin with real photos */
+function showFrame(i){const n=CARS[cur].photos.ext.length;frame=(i%n+n)%n;
+ [...$('frames').children].forEach((im,k)=>im.classList.toggle('on',k===frame));
+ [...$('dots').children].forEach((d,k)=>d.classList.toggle('on',k===frame));
+ [...$('hsLayer').children].forEach(h=>h.classList.toggle('off',frame!==0));}
+$('prevF').onclick=()=>{stopSpin();showFrame(frame-1);};
+$('nextF').onclick=()=>{stopSpin();showFrame(frame+1);};
+let spinT=null;
+function stopSpin(){clearInterval(spinT);spinT=null;$('tspin').setAttribute('aria-pressed',false);}
+$('tspin').onclick=()=>{if(spinT){stopSpin();return;}setMode('ext');$('tspin').setAttribute('aria-pressed',true);spinT=setInterval(()=>showFrame(frame+1),1400);};
+
+/* interior pan */
+let panX=0.5;
+function setPan(){const im=$('panImg'),w=im.offsetWidth-stage.clientWidth;im.style.transform=`translateX(${-Math.max(0,w)*panX}px)`;}
+function setMode(m){mode=m;stage.classList.toggle('int',m==='int');$('tExt').setAttribute('aria-pressed',m==='ext');$('tInt').setAttribute('aria-pressed',m==='int');if(m==='int'){stopSpin();requestAnimationFrame(setPan);}}
+$('tExt').onclick=()=>setMode('ext');$('tInt').onclick=()=>setMode('int');
+new ResizeObserver(()=>setPan()).observe(stage);$('panImg').onload=setPan;
+
+/* drag */
+let down=null,moved=false;
+stage.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;down={x:e.clientX,f:frame,p:panX};moved=false;stage.setPointerCapture(e.pointerId);stopSpin();});
+stage.addEventListener('pointermove',e=>{if(!down)return;const dx=e.clientX-down.x;if(Math.abs(dx)>6){moved=true;$('hint').classList.add('gone');}
+ if(mode==='ext'){const step=Math.max(60,stage.clientWidth/(CARS[cur].photos.ext.length*1.2));showFrame(down.f-Math.round(dx/step));}
+ else{panX=Math.min(1,Math.max(0,down.p-dx/stage.clientWidth));setPan();}});
+const up=()=>{if(down&&!moved&&mode==='ext')openLB(CARS[cur].photos.ext,frame,'');down=null;};
+stage.addEventListener('pointerup',up);stage.addEventListener('pointercancel',()=>down=null);
+setTimeout(()=>$('hint').classList.add('gone'),4500);
+
+/* finance */
+function calc(){const P=Math.max(0,(+$('fPrice').value||0)-(+$('fDown').value||0)),r=(+$('fApr').value||0)/1200,n=+$('fTerm').value;
+ const m=r?P*r/(1-Math.pow(1+r,-n)):P/n;$('fOut').firstChild.textContent=money(m);}
+['fPrice','fDown','fApr','fTerm'].forEach(id=>$(id).addEventListener('input',calc));
+
+/* lightbox */
+let lbList=[],lbI=0;
+function openLB(list,i,title){lbList=list;lbI=i;$('lbT').textContent=title||(CARS[cur].year+' '+CARS[cur].make+' '+CARS[cur].name);
+ $('lbS').innerHTML=list.map((p,k)=>`<button data-k="${k}"><img src="${img(p)}" alt=""></button>`).join('');
+ $('lb').classList.add('open');showLB();$('lbX').focus();}
+function showLB(){$('lbI').src=img(lbList[lbI]);[...$('lbS').children].forEach((b,k)=>b.setAttribute('aria-current',k===lbI));
+ $('lbP').style.visibility=$('lbN').style.visibility=lbList.length>1?'visible':'hidden';}
+$('lbS').onclick=e=>{const b=e.target.closest('button');if(b){lbI=+b.dataset.k;showLB();}};
+$('lbP').onclick=()=>{lbI=(lbI-1+lbList.length)%lbList.length;showLB();};
+$('lbN').onclick=()=>{lbI=(lbI+1)%lbList.length;showLB();};
+$('lbX').onclick=()=>$('lb').classList.remove('open');
+addEventListener('keydown',e=>{if(!$('lb').classList.contains('open'))return;if(e.key==='Escape')$('lbX').click();if(e.key==='ArrowRight')$('lbN').click();if(e.key==='ArrowLeft')$('lbP').click();});
+
+addEventListener('hashchange',()=>{const i=CARS.findIndex(c=>c.id===location.hash.slice(1));if(i>=0&&i!==cur){cur=i;render();}});
+/* message to Santi */
+const MSG={
+ es:{interes:c=>`Hola Santi! Me interesa el ${c.year} ${c.make} ${c.name} de ${money(c.price)} que vi en su página. ¿Sigue disponible?`,
+     cita:c=>`Hola Santi! Quiero hacer una cita para ver el ${c.year} ${c.make} ${c.name} (${money(c.price)}). ¿Qué día y horario tienen disponible?`,
+     title:'Escribile a Santi por Instagram',copied:'Mensaje copiado. Pegalo en el chat y mandalo.'},
+ en:{interes:c=>`Hi Santi! I'm interested in the ${c.year} ${c.make} ${c.name} for ${money(c.price)} I saw on your website. Is it still available?`,
+     cita:c=>`Hi Santi! I'd like to book a visit to see the ${c.year} ${c.make} ${c.name} (${money(c.price)}). What day and time works?`,
+     title:'Message Santi on Instagram',copied:'Message copied. Paste it in the chat and send.'}};
+let msgKind='interes',edited=false;
+const carLink=c=>location.origin+location.pathname+'#'+c.id;
+function fillMsg(){const c=CARS[cur];$('mdT').textContent=MSG[lang].title;$('mdImg').src=img(c.photos.ext[0]);$('mdCar').textContent=c.year+' '+c.make+' '+c.name;$('mdPrice').textContent=money(c.price);
+ [...document.querySelectorAll('.seg button')].forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===msgKind));
+ const link=location.protocol.startsWith('http')&&!location.hostname.endsWith('claude.ai')&&!location.hostname.endsWith('claudeusercontent.com')?'\n'+carLink(c):'';
+ $('mdText').value=MSG[lang][msgKind](c)+link;edited=false;
+ $('mdGo').href='https://ig.me/m/caccer.motorsports?ref=web-'+c.id+'-'+msgKind;}
+function openMsg(kind){msgKind=kind;fillMsg();$('md').classList.add('open');$('mdText').focus();}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-msg]');if(b){e.preventDefault();openMsg(b.dataset.msg);}});
+document.querySelector('.seg').addEventListener('click',e=>{const b=e.target.closest('button');if(b){msgKind=b.dataset.k;fillMsg();}});
+$('mdX').onclick=()=>$('md').classList.remove('open');
+$('md').addEventListener('click',e=>{if(e.target===$('md'))$('md').classList.remove('open');});
+addEventListener('keydown',e=>{if(e.key==='Escape')$('md').classList.remove('open');});
+$('mdGo').addEventListener('click',()=>{const t=$('mdText').value;
+ try{navigator.clipboard.writeText(t).catch(()=>{});}catch(e){}
+ try{$('mdText').select();document.execCommand('copy');}catch(e){}
+ $('mdTip').textContent=MSG[lang].copied;});
+setLang(lang);render(true);
+}
+</script>
+</body>
+</html>

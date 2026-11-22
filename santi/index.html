@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Caccer Negocio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800;900&family=Archivo+Narrow:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a dealer's back office ledger, plain and exact, numbers first.
+   IDEA: the dealer's deal jacket and the quarterly tax envelope, side by side.
+   PICTURE: the next tax payment as one big figure with its due date, then the profit by month bars.
+   COLOUR and TYPE: white ledger, graphite ink, Caccer red only for money owed; Archivo for figures, Archivo Narrow for labels.
+   LAYOUT: tabs across the top, figure-first summary, then tables you can edit row by row. */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0f1012);--soft:light-dark(#f4f4f2,#17191c);--ink:light-dark(#141518,#f2f2f0);
+--mute:light-dark(#5d6168,#a3a7ad);--line:light-dark(#e2e2de,#2b2e33);--red:#d9231a;--green:light-dark(#127a45,#4cc38a);--bar2:light-dark(#8a8f97,#6b7079)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Archivo,system-ui,sans-serif;overflow-x:clip}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 max(4vw,16px)}
+header{background:#0b0c0e;color:#f2f2f0}
+header .wrap{display:flex;align-items:center;gap:16px;min-height:60px;flex-wrap:wrap}
+.logo{font-weight:900;font-size:18px;display:flex;align-items:center;gap:10px}
+.logo i{width:24px;height:12px;background:var(--red);transform:skewX(-20deg)}
+.logo small{font:600 13px 'Archivo Narrow';color:#a3a7ad}
+.sync{margin-left:auto;font:600 13px 'Archivo Narrow';color:#a3a7ad}
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
+.tabs button{flex:none;background:none;border:0;border-bottom:3px solid transparent;padding:14px 14px 11px;font-weight:700;color:var(--mute);min-height:48px}
+.tabs button[aria-selected=true]{color:var(--ink);border-color:var(--red)}
+main{padding:24px 0 60px}
+h1{font-size:clamp(28px,3.4vw,40px);line-height:1.05;margin:0 0 6px;font-weight:900;text-wrap:balance}
+h2{font-size:22px;margin:32px 0 12px;font-weight:800}
+.sub{color:var(--mute);margin:0 0 20px}
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;align-items:stretch}
+.owed{background:var(--soft);border-radius:16px;padding:24px;border-left:8px solid var(--red)}
+.owed .lbl{font:700 14px 'Archivo Narrow';color:var(--mute)}
+.big{font-size:clamp(44px,6vw,72px);font-weight:900;line-height:1;letter-spacing:-.02em;margin:8px 0;white-space:nowrap}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.kpis div{background:var(--bg);padding:16px 18px}
+.kpis b{display:block;font-size:26px;font-weight:800;white-space:nowrap}
+.kpis span{font:600 13px 'Archivo Narrow';color:var(--mute)}
+.pos{color:var(--green)}.neg{color:var(--red)}
+.bars{display:grid;gap:6px;margin-top:8px}
+.bar{display:grid;grid-template-columns:44px minmax(0,1fr) 96px;gap:10px;align-items:center;font-size:14px}
+.bar .t{display:flex;flex-direction:column;gap:3px}
+.bar .t i{display:block;height:10px;border-radius:3px;background:var(--ink);min-width:2px}
+.bar .t i.a{background:var(--bar2)}
+.bar .n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.legend{display:flex;gap:16px;font:600 13px 'Archivo Narrow';color:var(--mute)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--ink);margin-right:6px;vertical-align:-2px}.legend i.a{background:var(--bar2)}
+.bar-row{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:var(--bg);font-weight:700;cursor:pointer}
+.btn.red{background:var(--red);border-color:var(--red);color:#fff}
+.btn.sm{min-height:36px;padding:0 10px;font-size:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{font:700 13px 'Archivo Narrow';color:var(--mute);text-align:left;padding:8px 10px;border-bottom:2px solid var(--ink)}
+td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--soft)}
+.tag{display:inline-block;font:700 12px 'Archivo Narrow';padding:2px 8px;border-radius:999px;background:var(--soft);border:1px solid var(--line)}
+.tag.ok{background:light-dark(#e7f5ee,#123323);border-color:transparent;color:var(--green)}
+.empty{padding:28px;text-align:center;color:var(--mute);border:1px dashed var(--line);border-radius:12px}
+.quarters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.q{border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:4px}
+.q h3{margin:0;font-size:18px}
+.q .due{font:600 13px 'Archivo Narrow';color:var(--mute)}
+.q dl{margin:8px 0 0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;font-size:14px}
+.q dt{color:var(--mute)}.q dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.q .pay{border-top:2px solid var(--ink);padding-top:8px;margin-top:6px;display:flex;justify-content:space-between;font-weight:800}
+.q.now{border-color:var(--red);box-shadow:0 0 0 1px var(--red)}
+.annual{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.annual section{border:1px solid var(--line);border-radius:14px;padding:16px}
+.annual h3{margin:0 0 8px;font-size:18px}
+.annual dl{margin:0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;font-size:15px}
+.annual dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.annual .tot{border-top:2px solid var(--ink);padding-top:6px;font-weight:800}
+.note{font-size:14px;color:var(--mute);background:var(--soft);border-radius:12px;padding:14px 16px;margin-top:18px}
+.note b{color:var(--ink)}
+label{display:grid;gap:5px;font:600 14px 'Archivo Narrow';color:var(--mute)}
+input,select,textarea{min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);padding:0 12px;font-size:16px;width:100%}
+textarea{min-height:70px;padding:10px 12px}
+.dlg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;place-items:center;z-index:20;padding:16px}
+.dlg.open{display:grid}
+.dlg form{background:var(--bg);border-radius:16px;max-width:640px;width:100%;max-height:92vh;overflow:auto;padding:22px}
+.dlg h3{margin:0 0 14px;font-size:22px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid2 .full{grid-column:1/-1}
+.calcline{grid-column:1/-1;background:var(--soft);border-radius:10px;padding:10px 12px;font-weight:700;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#141518;color:#fff;padding:10px 16px;border-radius:999px;opacity:0;transition:.3s;z-index:30;pointer-events:none}
+.toast.on{opacity:1}
+pre{white-space:pre-wrap;background:var(--soft);border-radius:12px;padding:14px;font-size:13px;max-height:320px;overflow:auto}
+.scroll{overflow-x:auto}
+@media(max-width:900px){.hero,.annual{grid-template-columns:1fr}.quarters{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.quarters,.grid2{grid-template-columns:1fr}.kpis b{font-size:22px}
+ table{font-size:14px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px;border-bottom:1px solid var(--line)}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:8em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:7.5em;margin-inline-start:-8em;font:600 13px 'Archivo Narrow';color:var(--mute)}.stack td:empty{display:none}}
+</style>
+<script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
+</head>
+<body>
+<header><div class="wrap"><div class="logo"><i></i>CACCER <small>Negocio de Santi</small></div><div class="sync" id="sync">Conectando…</div></div></header>
+<div class="wrap"><nav class="tabs" role="tablist" id="tabs">
+ <button role="tab" data-t="resumen" aria-selected="true">Resumen</button>
+ <button role="tab" data-t="autos" aria-selected="false">Inventario de autos</button>
+ <button role="tab" data-t="airbnb" aria-selected="false">Airbnb</button>
+ <button role="tab" data-t="gastos" aria-selected="false">Gastos</button>
+ <button role="tab" data-t="taxes" aria-selected="false">Impuestos</button>
+</nav></div>
+<main class="wrap" id="view"></main>
+
+<div class="dlg" id="dlg"><form id="frm" novalidate></form></div>
+<div class="toast" id="toast"></div>
+
+<script>
+{
+const $=id=>document.getElementById(id);
+const money=(n,d=0)=>(n<0?'-':'')+'$'+Math.abs(+n||0).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const m2=n=>money(n,2);
+const num=v=>{const x=parseFloat(String(v??'').replace(/[$,]/g,''));return isFinite(x)?x:0;};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>new Date().toISOString().slice(0,10);
+const MES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const qOf=d=>d?Math.floor((+d.slice(5,7)-1)/3)+1:0;
+const yOf=d=>d?+d.slice(0,4):0;
+const toast=t=>{$('toast').textContent=t;$('toast').classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>$('toast').classList.remove('on'),2200);};
+
+/* ---------- data ---------- */
+const S={autos:[],airbnb:[],gastos:[],settings:{salesRate:7.45,lodgingRate:0,year:new Date().getFullYear()}};
+let db=null,tab='resumen',year=new Date().getFullYear();
+const LS='caccer-santi-v1';
+function lsSave(){try{localStorage.setItem(LS,JSON.stringify(S));}catch(e){}}
+function lsLoad(){try{const x=JSON.parse(localStorage.getItem(LS));if(x)Object.assign(S,x);}catch(e){}}
+async function save(coll,obj){if(!obj.id)obj.id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+ const {id,...body}=obj;
+ if(db){try{await db.collection(coll).doc(id).set(body);}catch(e){toast(e.code==='invalid_argument'?'No tenés permiso para guardar':'No se pudo guardar, probá de nuevo');return;}}
+ const arr=S[coll],i=arr.findIndex(x=>x.id===id);if(i>=0)arr[i]=obj;else arr.push(obj);if(!db)lsSave();draw();toast('Guardado');}
+async function del(coll,id){if(db){try{await db.collection(coll).doc(id).delete();}catch(e){toast('No se pudo borrar');return;}}
+ S[coll]=S[coll].filter(x=>x.id!==id);if(!db)lsSave();draw();toast('Borrado');}
+async function saveSettings(){if(db){try{await db.doc('settings/main').set(S.settings);}catch(e){}}else lsSave();}
+
+/* ---------- calculations ---------- */
+const autoProfit=a=>a.status==='vendido'?num(a.salePrice)+num(a.docFee)-num(a.cost)-num(a.recon)-sumG(g=>g.autoId===a.id):0;
+const sumG=f=>S.gastos.filter(f).reduce((s,g)=>s+num(g.amount),0);
+function quarter(y,q){
+ const sold=S.autos.filter(a=>a.status==='vendido'&&yOf(a.saleDate)===y&&qOf(a.saleDate)===q);
+ const air=S.airbnb.filter(r=>yOf(r.date)===y&&qOf(r.date)===q);
+ const carSales=sold.reduce((s,a)=>s+num(a.salePrice)+num(a.docFee),0);
+ const carTax=sold.reduce((s,a)=>s+num(a.salesTax),0);
+ const airGross=air.reduce((s,r)=>s+num(r.gross),0);
+ const airPlat=air.filter(r=>r.platform==='Airbnb').reduce((s,r)=>s+num(r.gross),0);
+ const airPlatTax=air.reduce((s,r)=>s+num(r.taxPlatform),0);
+ const airSelfGross=airGross-airPlat;
+ const airSelfTax=air.reduce((s,r)=>s+num(r.taxSelf),0);
+ const due=q===4?`${y+1}-01-31`:`${y}-${['04-30','07-31','10-31'][q-1]}`;
+ return {sold,air,carSales,carTax,airGross,airPlat,airPlatTax,airSelfGross,airSelfTax,owe:carTax+airSelfTax,due};
+}
+function annual(y){
+ const sold=S.autos.filter(a=>a.status==='vendido'&&yOf(a.saleDate)===y);
+ const ventas=sold.reduce((s,a)=>s+num(a.salePrice)+num(a.docFee),0);
+ const cogs=sold.reduce((s,a)=>s+num(a.cost)+num(a.recon)+sumG(g=>g.autoId===a.id),0);
+ const gA=sumG(g=>yOf(g.date)===y&&g.line==='Autos'&&!g.autoId);
+ const air=S.airbnb.filter(r=>yOf(r.date)===y);
+ const airGross=air.reduce((s,r)=>s+num(r.gross),0),airFees=air.reduce((s,r)=>s+num(r.platformFee),0);
+ const gB=sumG(g=>yOf(g.date)===y&&g.line==='Airbnb');
+ const gG=sumG(g=>yOf(g.date)===y&&g.line==='General');
+ const inv=S.autos.filter(a=>a.status!=='vendido'&&(!a.buyDate||yOf(a.buyDate)<=y)).reduce((s,a)=>s+num(a.cost)+num(a.recon)+sumG(g=>g.autoId===a.id),0);
+ const taxQ=[1,2,3,4].map(q=>quarter(y,q));
+ return {sold,ventas,cogs,gA,autosNet:ventas-cogs-gA,airGross,airFees,gB,airNet:airGross-airFees-gB,gG,inv,taxQ,
+  total:ventas-cogs-gA+airGross-airFees-gB-gG,taxCollected:taxQ.reduce((s,q)=>s+q.carTax+q.airSelfTax,0)};
+}
+
+/* ---------- forms ---------- */
+const F={
+ autos:{title:'Auto',fields:[
+  ['year','Año','number'],['make','Marca'],['model','Modelo y versión','text','full'],['vin','VIN (opcional)'],['status','Estado','select',['disponible','vendido']],
+  ['buyDate','Fecha de compra','date'],['cost','Costo de compra $','money'],['recon','Reacondicionamiento $','money'],['listPrice','Precio publicado OTD $','money'],
+  ['saleDate','Fecha de venta','date'],['salePrice','Precio de venta (sin tax) $','money'],['docFee','Doc fee $','money'],['taxRate','Tasa sales tax %','money'],
+  ['salesTax','Sales tax cobrado $','money'],['titleFees','Título y registración (DMV) $','money'],['buyer','Comprador'],['notes','Notas','area','full']],
+  calc:o=>{const tax=(num(o.salePrice)+num(o.docFee))*num(o.taxRate||S.settings.salesRate)/100;
+   return `<span>Tax sugerido ${m2(tax)}</span><span>OTD ${money(num(o.salePrice)+num(o.docFee)+num(o.salesTax||tax)+num(o.titleFees))}</span><span>Ganancia ${money(num(o.salePrice)+num(o.docFee)-num(o.cost)-num(o.recon))}</span>`;}},
+ airbnb:{title:'Reserva / pago de Airbnb',fields:[
+  ['date','Fecha de check-in','date'],['nights','Noches','number'],['platform','Plataforma','select',['Airbnb','VRBO','Directo']],['guest','Huésped'],
+  ['gross','Renta + limpieza cobrada (sin impuestos) $','money','full'],['platformFee','Comisión de la plataforma $','money'],['taxPlatform','Impuestos que pagó la plataforma $','money'],
+  ['taxSelf','Impuestos que cobraste vos $','money'],['payout','Lo que te depositaron $','money'],['notes','Notas','area','full']],
+  calc:o=>o.platform&&o.platform!=='Airbnb'?`<span>Impuesto sugerido a cobrar ${m2(num(o.gross)*num(S.settings.lodgingRate)/100)} (tasa ${S.settings.lodgingRate||0}%)</span>`:`<span>Airbnb cobra y paga los impuestos de hospedaje en Utah</span>`},
+ gastos:{title:'Gasto',fields:[
+  ['date','Fecha','date'],['amount','Monto $','money'],['line','Negocio','select',['Autos','Airbnb','General']],
+  ['cat','Categoría','select',['Reparación y partes','Subasta y transporte','Publicidad','Seguro','Licencias y permisos','Limpieza','Servicios (luz, gas, internet)','Mantenimiento','Muebles y suministros','Interés de hipoteca','Impuesto a la propiedad','Teléfono y software','Comisiones bancarias','Otro']],
+  ['autoId','Auto (si es para un auto)','auto'],['note','Detalle','text','full']]}
+};
+let editing=null;
+function openForm(coll,obj){editing={coll,obj:{...obj}};const f=F[coll];const o=editing.obj;
+ const inp=([k,l,t='text',x])=>{const full=(x==='full'||t==='area')?' class="full"':'';const v=esc(o[k]??'');
+  if(t==='select'){const opts=Array.isArray(x)?x:[];return `<label${full}>${l}<select name="${k}">${opts.map(z=>`<option${o[k]===z?' selected':''}>${z}</option>`).join('')}</select></label>`;}
+  if(t==='auto')return `<label class="full">${l}<select name="${k}"><option value="">No, gasto general</option>${S.autos.map(a=>`<option value="${a.id}"${o[k]===a.id?' selected':''}>${esc(a.year+' '+a.make+' '+a.model)}</option>`).join('')}</select></label>`;
+  if(t==='area')return `<label class="full">${l}<textarea name="${k}">${v}</textarea></label>`;
+  return `<label${full}>${l}<input name="${k}" value="${v}" type="${t==='money'?'text':t}" ${t==='money'||t==='number'?'inputmode="decimal"':''}></label>`;};
+ $('frm').innerHTML=`<h3>${o.id?'Editar':'Nuevo'}: ${f.title}</h3><div class="grid2">${f.fields.map(inp).join('')}${f.calc?`<div class="calcline" id="calc"></div>`:''}</div>
+ <div class="row" style="margin-top:16px;justify-content:space-between"><div class="row"><button class="btn red" type="submit">Guardar</button><button class="btn" type="button" id="cancel">Cancelar</button></div>
+ ${o.id?`<button class="btn" type="button" id="delBtn">Borrar</button>`:''}</div>`;
+ const upd=()=>{const fd=Object.fromEntries(new FormData($('frm')));Object.assign(editing.obj,fd);if(f.calc)$('calc').innerHTML=f.calc(editing.obj);};
+ $('frm').oninput=upd;upd();$('dlg').classList.add('open');$('frm').querySelector('input,select').focus();
+ $('cancel').onclick=closeForm;
+ if(o.id)$('delBtn').onclick=e=>{if(e.target.dataset.sure){del(coll,o.id);closeForm();}else{e.target.dataset.sure=1;e.target.textContent='Tocá otra vez para borrar';e.target.classList.add('red');}};
+}
+function closeForm(){$('dlg').classList.remove('open');editing=null;}
+$('frm').onsubmit=e=>{e.preventDefault();const o=editing.obj;
+ if(editing.coll==='autos'){if(!o.make&&!o.model){toast('Poné marca o modelo');return;}if(!o.taxRate)o.taxRate=String(S.settings.salesRate);
+  if(o.status==='vendido'&&!o.salesTax)o.salesTax=((num(o.salePrice)+num(o.docFee))*num(o.taxRate)/100).toFixed(2);}
+ if(editing.coll!=='autos'&&!o.date){toast('Poné la fecha');return;}
+ save(editing.coll,o);closeForm();};
+$('dlg').addEventListener('click',e=>{if(e.target===$('dlg'))closeForm();});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&editing)closeForm();});
+
+/* ---------- views ---------- */
+function yearSel(){const ys=new Set([new Date().getFullYear(),year]);[...S.autos.map(a=>yOf(a.saleDate)),...S.airbnb.map(r=>yOf(r.date)),...S.gastos.map(g=>yOf(g.date))].forEach(y=>y&&ys.add(y));
+ return `<label style="max-width:140px">Año<select id="yearSel">${[...ys].sort().map(y=>`<option${y===year?' selected':''}>${y}</option>`).join('')}</select></label>`;}
+function resumen(){const A=annual(year),now=new Date(),cq=yOf(today())===year?qOf(today()):4,Q=quarter(year,cq);
+ const months=MES.map((m,i)=>{const mm=String(i+1).padStart(2,'0');
+  const car=S.autos.filter(a=>a.status==='vendido'&&a.saleDate?.startsWith(year+'-'+mm)).reduce((s,a)=>s+autoProfit(a),0);
+  const air=S.airbnb.filter(r=>r.date?.startsWith(year+'-'+mm)).reduce((s,r)=>s+num(r.gross)-num(r.platformFee),0);return {m,car,air};});
+ const mx=Math.max(1,...months.map(x=>Math.max(x.car,x.air)));
+ const avail=S.autos.filter(a=>a.status!=='vendido');
+ return `<h1>${A.total>=0?'Vas ganando':'Vas perdiendo'} ${money(Math.abs(A.total))} en ${year}</h1><p class="sub">Autos más Airbnb, después de costos y gastos.</p>
+ <div class="hero"><div class="owed"><div class="lbl">Sales tax a pagar, trimestre ${cq} (${year})</div><div class="big">${m2(Q.owe)}</div>
+  <div>Vence el <b>${fmtDate(Q.due)}</b> en tap.utah.gov · autos ${m2(Q.carTax)} · alojamiento directo ${m2(Q.airSelfTax)}</div></div>
+  <div class="kpis"><div><span>Ganancia autos</span><b class="${A.autosNet<0?'neg':''}">${money(A.autosNet)}</b></div><div><span>Neto Airbnb</span><b class="${A.airNet<0?'neg':''}">${money(A.airNet)}</b></div>
+  <div><span>Autos vendidos</span><b>${A.sold.length}</b></div><div><span>En inventario (${avail.length})</span><b>${money(A.inv)}</b></div></div></div>
+ <h2>Ganancia por mes</h2><div class="bar-row"><div class="legend"><span><i></i>Autos</span><span><i class="a"></i>Airbnb</span></div>${yearSel()}</div>
+ <div class="bars">${months.map(x=>`<div class="bar"><span>${x.m}</span><div class="t"><i style="width:${Math.max(0,x.car)/mx*100}%"></i><i class="a" style="width:${Math.max(0,x.air)/mx*100}%"></i></div><span class="n">${money(x.car+x.air)}</span></div>`).join('')}</div>
+ <h2>Autos disponibles</h2>${autosTable(avail)}`;}
+function fmtDate(d){if(!d)return '';const [y,m,dd]=d.split('-');return `${+dd} ${MES[+m-1].toLowerCase()} ${y}`;}
+function autosTable(list){if(!list.length)return `<div class="empty">No hay autos acá todavía.</div>`;
+ return `<div class="scroll"><table class="stack"><thead><tr><th>Auto</th><th>Estado</th><th class="n">Costo total</th><th class="n">Publicado / vendido</th><th class="n">Ganancia</th><th>Días</th></tr></thead><tbody>
+ ${list.map(a=>{const cost=num(a.cost)+num(a.recon)+sumG(g=>g.autoId===a.id);const end=a.status==='vendido'&&a.saleDate?new Date(a.saleDate):new Date();const days=a.buyDate?Math.round((end-new Date(a.buyDate))/864e5):'';
+  return `<tr class="click" data-c="autos" data-id="${a.id}"><td><b>${esc(a.year)} ${esc(a.make)}</b> ${esc(a.model)}${a.vin?`<br><small>${esc(a.vin)}</small>`:''}</td><td><span class="tag ${a.status==='vendido'?'ok':''}">${a.status||'disponible'}</span></td>
+  <td class="n">${cost?money(cost):'falta'}</td><td class="n">${a.status==='vendido'?money(num(a.salePrice)+num(a.docFee)):money(a.listPrice)}</td><td class="n ${autoProfit(a)<0?'neg':''}">${a.status==='vendido'?money(autoProfit(a)):''}</td><td>${days}</td></tr>`;}).join('')}</tbody></table></div>`;}
+function autos(){const sold=S.autos.filter(a=>a.status==='vendido').sort((a,b)=>(b.saleDate||'').localeCompare(a.saleDate||''));const av=S.autos.filter(a=>a.status!=='vendido');
+ return `<div class="bar-row"><div><h1>Inventario de autos</h1><p class="sub">Tocá un auto para editarlo o marcarlo vendido. Al venderlo, el sales tax se calcula con la tasa de ${S.settings.salesRate}%.</p></div><button class="btn red" data-new="autos">+ Agregar auto</button></div>
+ <h2>Disponibles (${av.length})</h2>${autosTable(av)}<h2>Vendidos (${sold.length})</h2>${autosTable(sold)}`;}
+function airbnb(){const list=S.airbnb.filter(r=>yOf(r.date)===year).sort((a,b)=>b.date.localeCompare(a.date));
+ return `<div class="bar-row"><div><h1>Airbnb</h1><p class="sub">Una línea por reserva. Si la reserva fue por Airbnb, Airbnb ya cobra y paga los impuestos de hospedaje de Utah.</p></div><div class="row">${yearSel()}<button class="btn red" data-new="airbnb">+ Agregar reserva</button></div></div>
+ ${list.length?`<div class="scroll"><table class="stack"><thead><tr><th>Check-in</th><th>Plataforma</th><th>Noches</th><th class="n">Cobrado</th><th class="n">Comisión</th><th class="n">Tax plataforma</th><th class="n">Tax tuyo</th><th class="n">Depositado</th></tr></thead><tbody>
+ ${list.map(r=>`<tr class="click" data-c="airbnb" data-id="${r.id}"><td>${fmtDate(r.date)}</td><td>${esc(r.platform)}</td><td>${esc(r.nights)}</td><td class="n">${m2(r.gross)}</td><td class="n">${m2(r.platformFee)}</td><td class="n">${m2(r.taxPlatform)}</td><td class="n">${m2(r.taxSelf)}</td><td class="n">${m2(r.payout)}</td></tr>`).join('')}
+ </tbody></table></div>`:`<div class="empty">Todavía no hay reservas en ${year}.</div>`}`;}
+function gastos(){const list=S.gastos.filter(g=>yOf(g.date)===year).sort((a,b)=>b.date.localeCompare(a.date));
+ const by={};list.forEach(g=>{by[g.cat]=(by[g.cat]||0)+num(g.amount);});const tot=list.reduce((s,g)=>s+num(g.amount),0);
+ return `<div class="bar-row"><div><h1>Gastos ${money(tot)}</h1><p class="sub">Guardá cada gasto con su recibo. Si es de un auto, elegilo y suma a su costo.</p></div><div class="row">${yearSel()}<button class="btn red" data-new="gastos">+ Agregar gasto</button></div></div>
+ ${Object.keys(by).length?`<div class="bars" style="margin-bottom:20px">${Object.entries(by).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="bar" style="grid-template-columns:minmax(0,180px) minmax(0,1fr) 96px"><span>${esc(k)}</span><div class="t"><i style="width:${v/tot*100}%"></i></div><span class="n">${money(v)}</span></div>`).join('')}</div>`:''}
+ ${list.length?`<div class="scroll"><table class="stack"><thead><tr><th>Fecha</th><th>Negocio</th><th>Categoría</th><th>Detalle</th><th class="n">Monto</th></tr></thead><tbody>
+ ${list.map(g=>{const a=S.autos.find(x=>x.id===g.autoId);return `<tr class="click" data-c="gastos" data-id="${g.id}"><td>${fmtDate(g.date)}</td><td>${esc(g.line)}</td><td>${esc(g.cat)}</td><td>${esc(g.note)}${a?` <span class="tag">${esc(a.year+' '+a.model)}</span>`:''}</td><td class="n">${m2(g.amount)}</td></tr>`;}).join('')}
+ </tbody></table></div>`:`<div class="empty">Sin gastos en ${year}.</div>`}`;}
+function taxes(){const A=annual(year),cq=yOf(today())===year?qOf(today()):0;
+ return `<div class="bar-row"><div><h1>Impuestos ${year}</h1><p class="sub">Resumen para declarar sales tax cada 3 meses y para tu contador a fin de año.</p></div>${yearSel()}</div>
+ <div class="row" style="margin:4px 0 18px"><label style="max-width:200px">Tasa sales tax autos %<input id="setSales" inputmode="decimal" value="${S.settings.salesRate}"></label>
+ <label style="max-width:260px">Tasa hospedaje directo % (sales + TRT)<input id="setLodg" inputmode="decimal" value="${S.settings.lodgingRate||''}" placeholder="ver tax.utah.gov"></label></div>
+ <h2>Sales tax por trimestre</h2><div class="quarters">${A.taxQ.map((q,i)=>`<div class="q ${i+1===cq?'now':''}"><h3>Trimestre ${i+1}</h3><div class="due">Vence ${fmtDate(q.due)}</div>
+  <dl><dt>Autos vendidos</dt><dd>${q.sold.length}</dd><dt>Ventas gravables autos</dt><dd>${money(q.carSales)}</dd><dt>Sales tax autos</dt><dd>${m2(q.carTax)}</dd>
+  <dt>Hospedaje bruto</dt><dd>${money(q.airGross)}</dd><dt>Ya pagado por Airbnb</dt><dd>${m2(q.airPlatTax)}</dd><dt>Hospedaje directo / VRBO</dt><dd>${money(q.airSelfGross)}</dd><dt>Tax hospedaje tuyo</dt><dd>${m2(q.airSelfTax)}</dd></dl>
+  <div class="pay"><span>A pagar</span><span class="${q.owe?'neg':''}">${m2(q.owe)}</span></div>
+  <button class="btn sm" data-copyq="${i+1}">Copiar resumen</button></div>`).join('')}</div>
+ <div class="note"><b>Cómo se declara en Utah.</b> Los que declaran trimestral pagan el 30 de abril, 31 de julio, 31 de octubre y 31 de enero, en tap.utah.gov. Las ventas de autos van en el TC-62S. El hospedaje que cobrás vos (directo o VRBO) lleva sales tax en el TC-62S y transient room tax en el TC-62T. Las reservas por Airbnb ya las paga Airbnb. Si un trimestre no vendiste nada, igual hay que presentar la declaración en cero. Las tasas cambian según la dirección: confirmalas en tax.utah.gov/sales/rates.</div>
+ <h2>Resumen anual para el contador</h2><div class="annual">
+  <section><h3>Autos</h3><dl><dt>Ventas (precio + doc fee)</dt><dd>${money(A.ventas)}</dd><dt>Costo de autos vendidos</dt><dd>${A.cogs?"-"+money(A.cogs):money(0)}</dd><dt>Ganancia bruta</dt><dd>${money(A.ventas-A.cogs)}</dd><dt>Otros gastos de autos</dt><dd>${A.gA?"-"+money(A.gA):money(0)}</dd><dt class="tot">Neto autos</dt><dd class="tot">${money(A.autosNet)}</dd><dt>Inventario sin vender (costo)</dt><dd>${money(A.inv)}</dd></dl></section>
+  <section><h3>Airbnb</h3><dl><dt>Ingreso bruto</dt><dd>${money(A.airGross)}</dd><dt>Comisiones de plataforma</dt><dd>${A.airFees?"-"+money(A.airFees):money(0)}</dd><dt>Gastos del Airbnb</dt><dd>${A.gB?"-"+money(A.gB):money(0)}</dd><dt class="tot">Neto Airbnb</dt><dd class="tot">${money(A.airNet)}</dd></dl></section>
+  <section><h3>Total del año</h3><dl><dt>Neto autos</dt><dd>${money(A.autosNet)}</dd><dt>Neto Airbnb</dt><dd>${money(A.airNet)}</dd><dt>Gastos generales</dt><dd>${A.gG?"-"+money(A.gG):money(0)}</dd><dt class="tot">Ganancia del año</dt><dd class="tot">${money(A.total)}</dd><dt>Sales tax cobrado y declarado</dt><dd>${m2(A.taxCollected)}</dd></dl></section>
+ </div>
+ <div class="row" style="margin-top:16px"><button class="btn red" id="copyYear">Copiar resumen anual</button><button class="btn" id="csv">Descargar todo en CSV</button></div>
+ <p class="note">Este resumen ordena los números para tu contador. No reemplaza su consejo: el sales tax cobrado no es ingreso tuyo, y la depreciación del Airbnb la calcula el contador.</p>`;}
+
+function qText(y,n){const q=quarter(y,n);return `CACCER MOTORSPORTS · Sales tax ${y} T${n} (vence ${q.due})
+Autos vendidos: ${q.sold.length}
+Ventas gravables autos: ${m2(q.carSales)}
+Sales tax autos (TC-62S): ${m2(q.carTax)}
+Hospedaje bruto total: ${m2(q.airGross)}
+  Por Airbnb (impuestos ya pagados por Airbnb ${m2(q.airPlatTax)}): ${m2(q.airPlat)}
+  Directo / VRBO: ${m2(q.airSelfGross)}
+Tax hospedaje cobrado por mí (TC-62S y TC-62T): ${m2(q.airSelfTax)}
+TOTAL A PAGAR: ${m2(q.owe)}`;}
+function yText(y){const A=annual(y);return `CACCER MOTORSPORTS · Resumen ${y}
+AUTOS: ventas ${m2(A.ventas)} | costo vendidos ${m2(A.cogs)} | otros gastos ${m2(A.gA)} | neto ${m2(A.autosNet)} | autos vendidos ${A.sold.length} | inventario al costo ${m2(A.inv)}
+AIRBNB: bruto ${m2(A.airGross)} | comisiones ${m2(A.airFees)} | gastos ${m2(A.gB)} | neto ${m2(A.airNet)}
+GENERALES: ${m2(A.gG)}
+GANANCIA DEL AÑO: ${m2(A.total)}
+Sales tax cobrado y declarado: ${m2(A.taxCollected)}
+`+[1,2,3,4].map(n=>qText(y,n)).join('\n\n');}
+async function copy(t){try{await navigator.clipboard.writeText(t);toast('Copiado');}catch(e){$('frm').innerHTML=`<h3>Copiá este texto</h3><pre>${esc(t)}</pre><button class="btn" type="button" id="cancel">Cerrar</button>`;$('dlg').classList.add('open');$('cancel').onclick=closeForm;editing={};}}
+function csv(){const rows=[];const add=(name,list,keys)=>{rows.push(name);rows.push(keys.join(','));list.forEach(o=>rows.push(keys.map(k=>`"${String(o[k]??'').replace(/"/g,'""')}"`).join(',')));rows.push('');};
+ add('AUTOS',S.autos,['year','make','model','vin','status','buyDate','cost','recon','listPrice','saleDate','salePrice','docFee','taxRate','salesTax','titleFees','buyer','notes']);
+ add('AIRBNB',S.airbnb,['date','nights','platform','guest','gross','platformFee','taxPlatform','taxSelf','payout','notes']);
+ add('GASTOS',S.gastos,['date','line','cat','amount','autoId','note']);return rows.join('\n');}
+
+function draw(){const v=$('view');v.innerHTML=({resumen,autos,airbnb,gastos,taxes})[tab]();}
+$('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;tab=b.dataset.t;[...$('tabs').children].forEach(x=>x.setAttribute('aria-selected',x===b));draw();scrollTo(0,0);};
+$('view').addEventListener('click',async e=>{const t=e.target;
+ const r=t.closest('tr.click');if(r){openForm(r.dataset.c,S[r.dataset.c].find(x=>x.id===r.dataset.id));return;}
+ if(t.dataset.new){const d={autos:{status:'disponible',year:'',buyDate:today()},airbnb:{date:today(),platform:'Airbnb'},gastos:{date:today(),line:'Autos'}}[t.dataset.new];openForm(t.dataset.new,d);return;}
+ if(t.dataset.copyq){copy(qText(year,+t.dataset.copyq));return;}
+ if(t.id==='copyYear'){copy(yText(year));return;}
+ if(t.id==='csv'){const data=csv();const dl=await (window.claude?.use?.('downloads')??Promise.resolve(null)).catch(()=>null);
+  if(dl){try{await dl.save({filename:`caccer-${year}.csv`,data});}catch(e){}}else copy(data);}
+});
+$('view').addEventListener('change',e=>{if(e.target.id==='yearSel'){year=+e.target.value;draw();}
+ if(e.target.id==='setSales'){S.settings.salesRate=num(e.target.value);saveSettings();draw();toast('Tasa guardada');}
+ if(e.target.id==='setLodg'){S.settings.lodgingRate=num(e.target.value);saveSettings();toast('Tasa guardada');}});
+
+/* ---------- boot ---------- */
+draw();
+(async()=>{let timer=setTimeout(()=>{$('sync').textContent='Sin conexión: los datos pueden estar viejos';},10000);
+ db=await (window.claude?.use?.('db')??Promise.resolve(null)).catch(()=>null);
+ if(!db){clearTimeout(timer);lsLoad();$('sync').textContent='Guardado solo en este navegador';draw();return;}
+ const ready=new Set();
+ for(const c of ['autos','airbnb','gastos'])db.collection(c).onSnapshot(s=>{S[c]=s.docs.map(d=>({id:d.id,...d.data()}));
+  if(!s.metadata.fromCache){ready.add(c);if(ready.size===3){clearTimeout(timer);$('sync').textContent='Guardado en la nube';}}if(!editing)draw();},
+  err=>{clearTimeout(timer);$('sync').textContent=err.code==='revoked'?'Sin acceso':'No se pudo conectar';});
+ db.doc('settings/main').onSnapshot(s=>{if(s.exists)Object.assign(S.settings,s.data());if(!editing)draw();},()=>{});
+})();
+}
+</script>
+</body>
+</html>
