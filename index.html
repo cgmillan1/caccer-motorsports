@@ -11,7 +11,7 @@
    IDEA: the showroom turntable plus the window sticker you read before you buy.
    PICTURE: each car as a live 3D model on a lit turntable, with hotspots that open the real photos.
    COLOUR and TYPE: asphalt graphite, paper white sticker, Caccer red accent; Archivo wide for names, Archivo Narrow for specs.
-   LAYOUT: stage first, sticker beside it, the 5-car lineup as parking spots, then photos and the visit band. */
+   LAYOUT: stage first, sticker beside it, the inventory grid with search and filters, then photos and the visit band. */
 :root{color-scheme:light dark;
 --bg:light-dark(#f3f3f1,#0f1012);--ink:light-dark(#141518,#f2f2f0);--mute:light-dark(#5d6168,#a3a7ad);
 --card:light-dark(#ffffff,#1a1c20);--line:light-dark(#dcdcd8,#2b2e33);--red:#e3241b;--stage:#121316;--paper:#fbfaf6}
@@ -89,6 +89,41 @@ box-shadow:0 24px 60px rgba(0,0,0,.45);border-top:10px solid var(--red)}
 .btn.ghost{background:#ececE8;color:#141518}
 .fine{font-size:13px;color:#5d6168;margin:12px 0 0;line-height:1.4}
 
+/* inventory */
+.inv{background:var(--bg);padding:clamp(28px,4vw,48px) 0 8px}
+.invhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.invhead h2{margin:0 0 4px}
+.count{margin:0;color:var(--mute);font:600 15px 'Archivo Narrow'}
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin:16px 0 20px;padding:14px;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.filters label{display:grid;gap:4px;font:600 13px 'Archivo Narrow';color:var(--mute)}
+.filters select,.filters input{min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 12px;font:16px Archivo,sans-serif}
+.f-q{flex:1 1 100%}.f-q input{width:100%}.filters label:not(.f-q){flex:1 1 140px}.filters select{width:100%}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.seg2{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:3px;min-height:44px}
+.seg2 button{border:0;background:none;border-radius:8px;padding:0 14px;font:700 14px Archivo;color:var(--mute);min-height:36px}
+.seg2 button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.reset{background:none;border:0;color:var(--red);font:700 14px Archivo;min-height:44px;padding:0 6px;text-decoration:underline;text-underline-offset:3px}
+.reset[hidden]{display:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.car{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s;position:relative}
+.car:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(0,0,0,.18)}
+.car[aria-current=true]{border-color:var(--red);box-shadow:0 0 0 2px var(--red)}
+.car .ph{position:relative;aspect-ratio:3/2;background:#222;border:0;padding:0;display:block;width:100%}
+.car .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.car .n{position:absolute;left:10px;top:10px;background:rgba(10,11,12,.75);color:#fff;font:700 12px 'Archivo Narrow';padding:3px 8px;border-radius:999px}
+.car .viewing{position:absolute;right:10px;top:10px;background:var(--red);color:#fff;font:700 12px 'Archivo Narrow';padding:3px 8px;border-radius:999px}
+.car .body{padding:14px 16px 16px;display:grid;gap:8px;flex:1}
+.car h3{margin:0;font-size:17px;line-height:1.25}
+.car h3 small{display:block;color:var(--mute);font:600 13px 'Archivo Narrow'}
+.car .pr{font-size:26px;font-weight:900;letter-spacing:-.01em;white-space:nowrap}
+.car .pr small{font:600 12px 'Archivo Narrow';color:var(--mute);margin-left:6px;letter-spacing:0}
+.car .tags{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.car .tags li{font:600 13px 'Archivo Narrow';background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:3px 10px;white-space:nowrap}
+.car .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto;padding-top:6px}
+.car .acts button{min-height:44px;border-radius:10px;font-weight:700;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.car .acts .go{background:var(--red);border-color:var(--red);color:#fff}
+.empty{grid-column:1/-1;text-align:center;padding:36px;border:1px dashed var(--line);border-radius:14px;color:var(--mute)}
+@media(max-width:600px){.filters{padding:10px;gap:8px}.filters label:not(.f-q){flex:1 1 calc(50% - 8px)}.filters select{width:100%}.seg2{flex:1 1 100%}.seg2 button{flex:1}}
 /* lineup */
 .lineup{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;padding-bottom:30px}
 .spot{background:#1a1c20;border:1px solid #2b2e33;border-radius:12px;padding:0 0 12px;color:#f2f2f0;text-align:left;overflow:hidden;position:relative}
@@ -191,18 +226,18 @@ html.intro-on{overflow:hidden}
 .imorph{position:fixed;z-index:101;overflow:hidden;pointer-events:none;box-shadow:0 30px 80px rgba(0,0,0,.45)}
 .imorph img{transition:opacity .25s ease}
 /* page chrome waits off-stage while the intro plays */
-html.intro-on header,html.intro-on .sticker,html.intro-on .lineup,html.intro-on .mbar,
+html.intro-on header,html.intro-on .sticker,html.intro-on .lineup,html.intro-on .inv,html.intro-on .mbar,
 html.intro-on .stage .title,html.intro-on .stage .wm,html.intro-on .stage .tools,html.intro-on .stage .dots,html.intro-on .stage .arrow,html.intro-on .stage .hint,html.intro-on #hsLayer{opacity:0;transform:translateY(14px)}
 html.intro-on .sticker{transform:translateX(28px)}
 html.intro-on header{transform:translateY(-12px)}
 html.intro-on .frames,html.morphing .frames{opacity:0}
-html.settle header,html.settle .sticker,html.settle .lineup,html.settle .mbar,
+html.settle header,html.settle .sticker,html.settle .lineup,html.settle .inv,html.settle .mbar,
 html.settle .stage .title,html.settle .stage .wm,html.settle .stage .tools,html.settle .stage .dots,html.settle .stage .arrow,html.settle .stage .hint,html.settle #hsLayer{transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
 html.settle header{transition-delay:.15s}
 html.settle .stage .title{transition-delay:.45s}
 html.settle .stage .tools,html.settle .stage .dots,html.settle .stage .arrow,html.settle #hsLayer{transition-delay:.6s}
 html.settle .sticker{transition-delay:.35s}
-html.settle .lineup{transition-delay:.55s}
+html.settle .lineup,html.settle .inv{transition-delay:.55s}
 html.settle .stage .hint{transition-delay:.9s}
 </style>
 </head>
@@ -225,7 +260,7 @@ html.settle .stage .hint{transition-delay:.9s}
 <header><div class="wrap">
  <a class="logo" href="#inventario" aria-label="Caccer Motorsports"><img src="img/caccer_logo.png" alt="Caccer Motorsports" width="244" height="38"><small>West Jordan, UT</small></a>
  <nav>
-  <a href="#inventario" data-es="Inventario" data-en="Inventory">Inventario</a>
+  <a href="#autos" data-es="Inventario" data-en="Inventory">Inventario</a>
   <a href="#visitar" data-es="Visitanos" data-en="Visit us">Visitanos</a>
   <div class="lang" role="group" aria-label="Idioma"><button id="l-es" aria-pressed="true">ES</button><button id="l-en" aria-pressed="false">EN</button></div>
  </nav>
@@ -262,8 +297,21 @@ html.settle .stage .hint{transition-delay:.9s}
    <p class="fine" data-es="Aceptamos tu auto como parte de pago. Atendemos con cita de 9am a 7pm." data-en="Trade-ins welcome. Visits by appointment, 9am to 7pm.">Aceptamos tu auto como parte de pago. Atendemos con cita de 9am a 7pm.</p>
   </aside>
  </div>
- <div class="wrap"><div class="lineup" id="lineup" role="list"></div></div>
 </section>
+
+<section class="inv" id="autos" aria-labelledby="invT"><div class="wrap">
+ <div class="invhead"><h2 id="invT" data-es="Inventario disponible" data-en="Available inventory">Inventario disponible</h2><p class="count" id="invCount" aria-live="polite"></p></div>
+ <div class="filters" role="search">
+  <label class="f-q"><span class="sr" data-es="Buscar" data-en="Search">Buscar</span><input id="fq" type="search" autocomplete="off" data-ph-es="Buscar marca, modelo o año" data-ph-en="Search make, model or year" placeholder="Buscar marca, modelo o año"></label>
+  <div class="seg2" role="group" id="fBody"></div>
+  <label><span data-es="Marca" data-en="Make">Marca</span><select id="fMake"></select></label>
+  <label><span data-es="Precio" data-en="Price">Precio</span><select id="fPrice"></select></label>
+  <label><span data-es="Millas" data-en="Miles">Millas</span><select id="fMiles"></select></label>
+  <label><span data-es="Ordenar" data-en="Sort">Ordenar</span><select id="fSort"></select></label>
+  <button class="reset" id="fReset" data-es="Limpiar filtros" data-en="Clear filters">Limpiar filtros</button>
+ </div>
+ <div class="grid" id="invGrid"></div>
+</div></section>
 
 <section class="band"><div class="wrap detail">
  <div class="gallery" id="gallery"></div>
@@ -345,14 +393,14 @@ const stage=$('stage');
 function setLang(l){lang=l;document.documentElement.lang=l;try{localStorage.setItem('caccer-lang',l);}catch(e){}
  $('l-es').setAttribute('aria-pressed',l==='es');$('l-en').setAttribute('aria-pressed',l==='en');
  document.querySelectorAll('[data-es]').forEach(e=>{if(e.firstChild&&e.firstChild.nodeType===3&&e.children.length===0)e.textContent=e.dataset[l];else if(!e.children.length)e.textContent=e.dataset[l];});
- render(false);if($('md').classList.contains('open'))fillMsg();}
+ drawFilters();render(false);if($('md').classList.contains('open'))fillMsg();}
 $('l-es').onclick=()=>setLang('es');$('l-en').onclick=()=>setLang('en');
 
 function render(newCar=true){const c=CARS[cur];
  $('cYear').textContent=c.year+' '+c.make;$('cName').textContent=c.name;$('cPrice').textContent=money(c.price);$('mbName').textContent=c.year+' '+c.make+' '+c.name;$('mbPrice').textContent=money(c.price);
  $('cSpecs').innerHTML=c.specs[lang].map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
  $('openAll').textContent=(lang==='es'?'Ver las ':'See all ')+allPhotos(c).length+(lang==='es'?' fotos':' photos');
- $('lineup').innerHTML=CARS.map((k,i)=>`<button class="spot" role="listitem" data-i="${i}" aria-current="${i===cur}"><img src="${img(k.photos.ext[0])}" alt="" loading="lazy"><b>${k.year} ${k.make} ${k.name}</b><span>${money(k.price)}</span></button>`).join('');
+ drawInv();
  const ph=allPhotos(c);
  $('gallery').innerHTML=ph.slice(0,7).map((p,i)=>`<button data-p="${i}" aria-label="Foto ${i+1}"><img src="${img(p)}" alt="${c.make} ${c.name}" loading="lazy"></button>`).join('');
  $('dTitle').textContent=c.year+' '+c.make+' '+c.name;
@@ -366,8 +414,45 @@ function render(newCar=true){const c=CARS[cur];
  $('hsLayer').innerHTML=Object.entries(c.hs).filter(([k])=>c.photos[k]).map(([k,[x,y]])=>`<button class="hs" data-k="${k}" style="left:${x}%;top:${y}%" aria-label="${PARTS[k][lang]}"><b>+</b><span>${PARTS[k][lang]} · ${c.photos[k].length}</span></button>`).join('');
  showFrame(frame);
 }
-$('lineup').addEventListener('click',e=>{const b=e.target.closest('.spot');if(!b)return;cur=+b.dataset.i;render();history.replaceState(null,'','#'+CARS[cur].id);
- if(innerWidth<960)stage.scrollIntoView({behavior:'smooth',block:'center'});});
+/* inventory search + filters */
+const drive=c=>/4x4/i.test(c.name)||c.body==='truck'?'4x4':'AWD';
+const BODY={truck:{es:'Pickups',en:'Trucks'},suv:{es:'SUVs',en:'SUVs'}};
+const PRICES=[['',{es:'Cualquier precio',en:'Any price'}],['0-15000',{es:'Hasta $15,000',en:'Up to $15,000'}],['15000-20000',{es:'$15,000 a $20,000',en:'$15,000 to $20,000'}],['20000-30000',{es:'$20,000 a $30,000',en:'$20,000 to $30,000'}],['30000-1e9',{es:'Más de $30,000',en:'Over $30,000'}]];
+const MILES=[['',{es:'Cualquiera',en:'Any'}],['75000',{es:'Hasta 75,000',en:'Up to 75,000'}],['100000',{es:'Hasta 100,000',en:'Up to 100,000'}],['150000',{es:'Hasta 150,000',en:'Up to 150,000'}]];
+const SORTS=[['rec',{es:'Recomendados',en:'Featured'}],['plo',{es:'Precio: menor a mayor',en:'Price: low to high'}],['phi',{es:'Precio: mayor a menor',en:'Price: high to low'}],['mlo',{es:'Menos millas',en:'Lowest miles'}],['new',{es:'Año: más nuevo',en:'Year: newest'}]];
+const FS={q:'',body:'',make:'',price:'',miles:'',sort:'rec'};
+const opt=(arr,v)=>arr.map(([k,t])=>`<option value="${k}"${k===v?' selected':''}>${typeof t==='string'?t:t[lang]}</option>`).join('');
+function drawFilters(){
+ const makes=[...new Set(CARS.map(c=>c.make))].sort();
+ $('fMake').innerHTML=opt([['',{es:'Todas',en:'All'}],...makes.map(m=>[m,m])],FS.make);
+ $('fPrice').innerHTML=opt(PRICES,FS.price);$('fMiles').innerHTML=opt(MILES,FS.miles);$('fSort').innerHTML=opt(SORTS,FS.sort);
+ $('fBody').innerHTML=[['',{es:'Todos',en:'All'}],['truck',BODY.truck],['suv',BODY.suv]].map(([k,t])=>`<button type="button" data-b="${k}" aria-pressed="${FS.body===k}">${t[lang]}</button>`).join('');
+ $('fq').placeholder=$('fq').dataset['ph'+(lang==='es'?'Es':'En')];}
+function drawInv(){
+ const q=FS.q.trim().toLowerCase();
+ let list=CARS.map((c,i)=>({c,i})).filter(({c})=>{
+  if(q&&!(`${c.year} ${c.make} ${c.name} ${drive(c)} ${BODY[c.body].en} ${BODY[c.body].es}`.toLowerCase().includes(q)))return false;
+  if(FS.body&&c.body!==FS.body)return false;if(FS.make&&c.make!==FS.make)return false;
+  if(FS.price){const [a,b]=FS.price.split('-').map(Number);if(c.price<a||c.price>b)return false;}
+  if(FS.miles&&c.miles>+FS.miles)return false;return true;});
+ const so={plo:(a,b)=>a.c.price-b.c.price,phi:(a,b)=>b.c.price-a.c.price,mlo:(a,b)=>a.c.miles-b.c.miles,new:(a,b)=>b.c.year-a.c.year}[FS.sort];if(so)list.sort(so);
+ const any=FS.q||FS.body||FS.make||FS.price||FS.miles;$('fReset').hidden=!any;
+ $('invCount').textContent=lang==='es'?`${list.length} de ${CARS.length} autos`:`${list.length} of ${CARS.length} vehicles`;
+ const mi=n=>n.toLocaleString('en-US')+(lang==='es'?' millas':' miles');
+ $('invGrid').innerHTML=list.length?list.map(({c,i})=>`<article class="car" aria-current="${i===cur}">
+  <button class="ph" data-view="${i}" aria-label="${lang==='es'?'Ver':'View'} ${c.year} ${c.make} ${c.name}"><img src="${img(c.photos.ext[0])}" alt="${c.year} ${c.make} ${c.name}" loading="lazy"><span class="n">${allPhotos(c).length} ${lang==='es'?'fotos':'photos'}</span>${i===cur?`<span class="viewing">${lang==='es'?'Viendo':'Viewing'}</span>`:''}</button>
+  <div class="body"><h3><small>${c.year} ${c.make}</small>${c.name}</h3>
+  <div class="pr">${money(c.price)}<small>OTD</small></div>
+  <ul class="tags"><li>${mi(c.miles)}</li><li>${drive(c)}</li><li>${BODY[c.body][lang].replace(/s$/,'')}</li></ul>
+  <div class="acts"><button data-view="${i}">${lang==='es'?'Ver auto':'View car'}</button><button class="go" data-ask="${i}">${lang==='es'?'Me interesa':'I\'m interested'}</button></div></div></article>`).join('')
+  :`<div class="empty">${lang==='es'?'No hay autos con esos filtros.':'No vehicles match those filters.'} <button class="reset" data-clear>${lang==='es'?'Limpiar filtros':'Clear filters'}</button></div>`;}
+function pick(i,scroll){cur=i;render();history.replaceState(null,'','#'+CARS[cur].id);if(scroll)$('inventario').scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'start'});}
+$('invGrid').addEventListener('click',e=>{const v=e.target.closest('[data-view]'),a=e.target.closest('[data-ask]'),c=e.target.closest('[data-clear]');
+ if(v)pick(+v.dataset.view,true);else if(a){pick(+a.dataset.ask,false);openMsg('interes');}else if(c)$('fReset').click();});
+let qT;$('fq').addEventListener('input',e=>{clearTimeout(qT);qT=setTimeout(()=>{FS.q=e.target.value;drawInv();},120);});
+[['fMake','make'],['fPrice','price'],['fMiles','miles'],['fSort','sort']].forEach(([id,k])=>$(id).addEventListener('change',e=>{FS[k]=e.target.value;drawInv();}));
+$('fBody').addEventListener('click',e=>{const b=e.target.closest('[data-b]');if(!b)return;FS.body=b.dataset.b;drawFilters();drawInv();});
+$('fReset').onclick=()=>{Object.assign(FS,{q:'',body:'',make:'',price:'',miles:'',sort:FS.sort});$('fq').value='';drawFilters();drawInv();};
 $('gallery').addEventListener('click',e=>{const b=e.target.closest('button');if(b)openLB(allPhotos(CARS[cur]),+b.dataset.p,'');});
 $('openAll').onclick=()=>openLB(allPhotos(CARS[cur]),0,'');
 $('hsLayer').addEventListener('click',e=>{const b=e.target.closest('.hs');if(!b)return;const c=CARS[cur],k=b.dataset.k;
