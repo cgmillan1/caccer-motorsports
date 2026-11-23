@@ -175,9 +175,54 @@ footer{padding:28px 0 40px;color:var(--mute);font-size:14px}
 @media(max-width:600px){.logo small{display:none}.mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;background:#0b0c0e;color:#fff;padding:10px 14px calc(10px + env(safe-area-inset-bottom));gap:12px;align-items:center;justify-content:space-between;box-shadow:0 -6px 20px rgba(0,0,0,.35)}
 .mbar b{display:block;font-size:14px;line-height:1.2}.mbar span{font:700 17px 'Archivo Narrow';color:#ff5a4f}.mbar .btn{flex:none}footer{padding-bottom:110px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* intro: the TRX is built by light, then that last frame flies into the stage and the page settles around it */
+.intro{display:none;position:fixed;inset:0;z-index:100;background:#050506;transition:opacity .45s ease}
+html.intro-on .intro{display:block}
+html.intro-on{overflow:hidden}
+.intro video,.intro .ibg,.imorph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.intro .ibg{filter:blur(28px) brightness(.45);transform:scale(1.1);opacity:0;transition:opacity 1.8s ease}
+.intro.lit .ibg{opacity:1}
+@media(max-aspect-ratio:3/2){.intro video,.imorph img{object-fit:contain}}
+.ibrand{position:absolute;left:max(4vw,16px);bottom:max(5vh,20px);display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.02em;font-size:clamp(16px,1.6vw,22px);color:#f2f2f0;opacity:0;transform:translateY(8px);transition:opacity .8s ease,transform .8s ease}
+.ibrand i{width:28px;height:14px;background:var(--red);transform:skewX(-20deg)}
+.intro.lit2 .ibrand{opacity:1;transform:none}
+.iskip{position:absolute;top:max(2vh,12px);right:max(2vw,12px);background:rgba(20,21,24,.6);color:#f2f2f0;border:1px solid #3a3d42;border-radius:999px;padding:8px 16px;min-height:40px;font:600 14px 'Archivo Narrow';backdrop-filter:blur(6px)}
+.iskip:hover{background:rgba(20,21,24,.85)}
+.imorph{position:fixed;z-index:101;overflow:hidden;pointer-events:none;box-shadow:0 30px 80px rgba(0,0,0,.45)}
+.imorph img{transition:opacity .25s ease}
+/* page chrome waits off-stage while the intro plays */
+html.intro-on header,html.intro-on .sticker,html.intro-on .lineup,html.intro-on .mbar,
+html.intro-on .stage .title,html.intro-on .stage .tools,html.intro-on .stage .dots,html.intro-on .stage .arrow,html.intro-on .stage .hint,html.intro-on #hsLayer{opacity:0;transform:translateY(14px)}
+html.intro-on .sticker{transform:translateX(28px)}
+html.intro-on header{transform:translateY(-12px)}
+html.intro-on .frames,html.morphing .frames{opacity:0}
+html.settle header,html.settle .sticker,html.settle .lineup,html.settle .mbar,
+html.settle .stage .title,html.settle .stage .tools,html.settle .stage .dots,html.settle .stage .arrow,html.settle .stage .hint,html.settle #hsLayer{transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+html.settle header{transition-delay:.15s}
+html.settle .stage .title{transition-delay:.45s}
+html.settle .stage .tools,html.settle .stage .dots,html.settle .stage .arrow,html.settle #hsLayer{transition-delay:.6s}
+html.settle .sticker{transition-delay:.35s}
+html.settle .lineup{transition-delay:.55s}
+html.settle .stage .hint{transition-delay:.9s}
 </style>
 </head>
 <body>
+<div class="intro" id="intro" aria-hidden="true">
+ <img class="ibg" src="img/trx_01.jpg" alt="">
+ <video id="introV" muted playsinline preload="auto" poster="img/intro_trx_start.jpg"><source src="img/intro_trx.mp4" type="video/mp4"></video>
+ <div class="ibrand"><i></i>CACCER MOTORSPORTS</div>
+ <button class="iskip" id="introSkip" data-es="Saltar intro" data-en="Skip intro">Saltar intro</button>
+</div>
+<script>
+/* play the intro once per visit, only when landing on the home page (or the TRX), never for reduced motion or data saver */
+(function(){var h=location.hash.slice(1),seen=false;
+ try{seen=sessionStorage.getItem('caccer-intro')==='1';}catch(e){}
+ var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+ var sd=navigator.connection&&navigator.connection.saveData;
+ if((h===''||h==='trx'||h==='inventario')&&!seen&&!rm&&!sd)document.documentElement.classList.add('intro-on');
+ else{var el=document.getElementById('intro');el.parentNode.removeChild(el);}})();
+</script>
 <header><div class="wrap">
  <a class="logo" href="#inventario"><i></i>CACCER MOTORSPORTS<small>West Jordan, UT</small></a>
  <nav>
@@ -420,6 +465,54 @@ $('mdGo').addEventListener('click',()=>{const t=$('mdText').value;
  $('mdTip').textContent=MSG[lang].copied;});
 setLang(lang);render(true);
 }
+</script>
+<script>
+/* intro handoff: the video's last frame is img/trx_01.jpg, the stage's first photo.
+   A copy of that photo grows from full screen into the stage box while the page settles in around it. */
+(function(){
+ const root=document.documentElement,intro=document.getElementById('intro');
+ if(!intro||!root.classList.contains('intro-on'))return;
+ const v=document.getElementById('introV'),stageEl=document.getElementById('stage');
+ let done=false,started=false;
+ const timers=[];
+ function finish(){
+  if(done)return;done=true;timers.forEach(clearTimeout);
+  try{sessionStorage.setItem('caccer-intro','1');}catch(e){}
+  try{v.pause();}catch(e){}
+  window.scrollTo(0,0);
+  const m=document.createElement('div');m.className='imorph';
+  const im=new Image();im.src='img/trx_01.jpg';im.alt='';m.appendChild(im);
+  // on screens narrower than the photo (phones) the video is letterboxed, so start from the photo's own box
+  const vw=innerWidth,vh=innerHeight,narrow=vw/vh<1.5,h0=narrow?vw/1.5:vh;
+  const start={left:'0px',top:(narrow?(vh-h0)/2:0)+'px',width:vw+'px',height:h0+'px',borderRadius:'0px'};
+  if(narrow)im.style.objectFit='cover';
+  Object.assign(m.style,start);
+  document.body.appendChild(m);
+  root.classList.add('morphing','settle');
+  root.classList.remove('intro-on');                 // page chrome starts settling in under the flying photo
+  intro.style.opacity='0';
+  const r=stageEl.getBoundingClientRect();
+  const end={left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px',borderRadius:getComputedStyle(stageEl).borderRadius};
+  const anim=m.animate([start,end],
+   {duration:900,easing:'cubic-bezier(.65,0,.2,1)',fill:'forwards'});
+  const land=()=>{root.classList.remove('morphing');im.style.opacity='0';
+   setTimeout(()=>{m.remove();intro.remove();},300);
+   setTimeout(()=>root.classList.remove('settle'),1800);};
+  anim.onfinish=land;anim.oncancel=land;
+ }
+ document.getElementById('introSkip').addEventListener('click',finish);
+ addEventListener('keydown',e=>{if(e.key==='Escape')finish();});
+ v.addEventListener('timeupdate',()=>{
+  if(v.currentTime>2.6)intro.classList.add('lit');
+  if(v.currentTime>3.4)intro.classList.add('lit2');
+ });
+ v.addEventListener('ended',finish);
+ v.addEventListener('error',finish);
+ v.addEventListener('playing',()=>{started=true;});
+ const p=v.play();if(p&&p.catch)p.catch(finish);      // autoplay blocked: go straight to the page
+ timers.push(setTimeout(()=>{if(!started)finish();},3000));   // slow network: don't keep people waiting
+ timers.push(setTimeout(finish,9000));                         // hard stop
+})();
 </script>
 </body>
 </html>

@@ -11,3 +11,8 @@ Para un giro 360 completo, poné 24 a 36 fotos alrededor del auto en `photos.ext
 
 ## Link directo a un auto
 `https://cgmillan1.github.io/caccer-motorsports/#trx` (ids: trx, velar, rav4, crv, f150)
+
+## Intro de la página
+Al entrar por primera vez (sin `#auto` en el link) se ve `img/intro_trx.mp4`: la TRX se dibuja con luz y su último cuadro, que es exactamente `img/trx_01.jpg`, vuela hasta el visor mientras aparece el resto de la página.
+Se muestra una vez por visita, se puede saltar, y no aparece con "reducir movimiento" ni con ahorro de datos.
+Si cambiás la foto `trx_01.jpg`, hay que volver a generar el video para que termine en la foto nueva.
