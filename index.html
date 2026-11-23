@@ -508,9 +508,11 @@ setLang(lang);render(true);
  });
  v.addEventListener('ended',finish);
  v.addEventListener('error',finish);
+ const srcEl=v.querySelector('source');if(srcEl)srcEl.addEventListener('error',finish);   // missing file: go straight to the page
+ if(v.networkState===3)finish();
  v.addEventListener('playing',()=>{started=true;});
  const p=v.play();if(p&&p.catch)p.catch(finish);      // autoplay blocked: go straight to the page
- timers.push(setTimeout(()=>{if(!started)finish();},3000));   // slow network: don't keep people waiting
+ timers.push(setTimeout(()=>{if(!started)finish();},2000));   // slow network: don't keep people waiting
  timers.push(setTimeout(finish,9000));                         // hard stop
 })();
 </script>
