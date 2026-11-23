@@ -291,8 +291,8 @@ html.settle .stage .hint{transition-delay:.9s}
  <div class="mdcar"><img id="mdImg" alt=""><div><b id="mdCar"></b><span id="mdPrice"></span></div></div>
  <div class="seg" role="group"><button data-k="interes" data-es="Me interesa" data-en="I'm interested">Me interesa</button><button data-k="cita" data-es="Quiero una cita" data-en="Book a visit">Quiero una cita</button></div>
  <label><span data-es="Tu mensaje (lo podés cambiar)" data-en="Your message (you can edit it)">Tu mensaje (lo podés cambiar)</span><textarea id="mdText" rows="5"></textarea></label>
- <a class="btn red" id="mdGo" target="_blank" rel="noopener" href="https://www.instagram.com/m/caccer.motorsports/" data-es="Copiar mensaje y abrir Instagram" data-en="Copy message and open Instagram">Copiar mensaje y abrir Instagram</a>
- <p class="fine" id="mdTip" data-es="Se abre el chat con @caccer.motorsports. Mantené apretado el cuadro de texto, tocá Pegar y mandalo." data-en="The chat with @caccer.motorsports opens. Long press the text box, tap Paste and send.">Se abre el chat con @caccer.motorsports. Mantené apretado el cuadro de texto, tocá Pegar y mandalo.</p>
+ <a class="btn red" id="mdGo" target="_blank" rel="noopener" href="https://www.instagram.com/caccer.motorsports/" data-es="Copiar mensaje y abrir Instagram" data-en="Copy message and open Instagram">Copiar mensaje y abrir Instagram</a>
+ <p class="fine" id="mdTip" data-es="Se abre el perfil de @caccer.motorsports. Tocá "Mensaje", mantené apretado el cuadro de texto, tocá Pegar y mandalo." data-en="The @caccer.motorsports profile opens. Tap "Message", long press the text box, tap Paste and send.">Se abre el perfil de @caccer.motorsports. Tocá "Mensaje", mantené apretado el cuadro de texto, tocá Pegar y mandalo.</p>
 </div></div>
 <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Fotos">
  <header><b id="lbT"></b><button class="x" id="lbX" aria-label="Cerrar">×</button></header>
@@ -420,17 +420,17 @@ addEventListener('hashchange',()=>{const i=CARS.findIndex(c=>c.id===location.has
 const MSG={
  es:{interes:c=>`Hola Santi! Me interesa el ${c.year} ${c.make} ${c.name} de ${money(c.price)} que vi en su página. ¿Sigue disponible?`,
      cita:c=>`Hola Santi! Quiero hacer una cita para ver el ${c.year} ${c.make} ${c.name} (${money(c.price)}). ¿Qué día y horario tienen disponible?`,
-     title:'Escribile a Santi por Instagram',copied:'Mensaje copiado. Pegalo en el chat y mandalo.'},
+     title:'Escribile a Santi por Instagram',copied:'Mensaje copiado. En el perfil tocá "Mensaje", pegalo y mandalo.'},
  en:{interes:c=>`Hi Santi! I'm interested in the ${c.year} ${c.make} ${c.name} for ${money(c.price)} I saw on your website. Is it still available?`,
      cita:c=>`Hi Santi! I'd like to book a visit to see the ${c.year} ${c.make} ${c.name} (${money(c.price)}). What day and time works?`,
-     title:'Message Santi on Instagram',copied:'Message copied. Paste it in the chat and send.'}};
+     title:'Message Santi on Instagram',copied:'Message copied. On the profile tap "Message", paste it and send.'}};
 let msgKind='interes',edited=false;
 const carLink=c=>location.origin+location.pathname+'#'+c.id;
 function fillMsg(){const c=CARS[cur];$('mdT').textContent=MSG[lang].title;$('mdImg').src=img(c.photos.ext[0]);$('mdCar').textContent=c.year+' '+c.make+' '+c.name;$('mdPrice').textContent=money(c.price);
  [...document.querySelectorAll('.seg button')].forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===msgKind));
  const link=location.protocol.startsWith('http')&&!location.hostname.endsWith('claude.ai')&&!location.hostname.endsWith('claudeusercontent.com')?'\n'+carLink(c):'';
  $('mdText').value=MSG[lang][msgKind](c)+link;edited=false;
- $('mdGo').href='https://www.instagram.com/m/caccer.motorsports/';}
+ $('mdGo').href='https://www.instagram.com/caccer.motorsports/';}
 function openMsg(kind){msgKind=kind;fillMsg();$('md').classList.add('open');$('mdText').focus();}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-msg]');if(b){e.preventDefault();openMsg(b.dataset.msg);}});
 document.querySelector('.seg').addEventListener('click',e=>{const b=e.target.closest('button');if(b){msgKind=b.dataset.k;fillMsg();}});
