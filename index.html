@@ -209,7 +209,7 @@ html.settle .stage .hint{transition-delay:.9s}
 <body>
 <div class="intro" id="intro" aria-hidden="true">
  <img class="ibg" src="img/trx_01.jpg" alt="">
- <video id="introV" muted playsinline preload="auto" poster="intro_trx_start.jpg"><source src="intro_trx.mp4" type="video/mp4"></video>
+ <video id="introV" muted playsinline preload="auto" poster="intro_trx2_start.jpg"><source src="intro_trx2.mp4" type="video/mp4"></video>
  <div class="ibrand"><img src="img/caccer_logo.png" alt="Caccer Motorsports"></div>
  <button class="iskip" id="introSkip" data-es="Saltar intro" data-en="Skip intro">Saltar intro</button>
 </div>
@@ -454,6 +454,7 @@ setLang(lang);render(true);
  const root=document.documentElement,intro=document.getElementById('intro');
  if(!intro||!root.classList.contains('intro-on'))return;
  const v=document.getElementById('introV'),stageEl=document.getElementById('stage');
+ const pre=new Image();pre.src='intro_trx2_end.jpg';
  let done=false,started=false;
  const timers=[];
  function finish(){
@@ -462,18 +463,22 @@ setLang(lang);render(true);
   try{v.pause();}catch(e){}
   window.scrollTo(0,0);
   const m=document.createElement('div');m.className='imorph';
-  const im=new Image();im.src='img/trx_01.jpg';im.alt='';m.appendChild(im);
-  // on screens narrower than the photo (phones) the video is letterboxed, so start from the photo's own box
-  const vw=innerWidth,vh=innerHeight,narrow=vw/vh<1.5,h0=narrow?vw/1.5:vh;
-  const start={left:'0px',top:(narrow?(vh-h0)/2:0)+'px',width:vw+'px',height:h0+'px',borderRadius:'0px'};
-  if(narrow)im.style.objectFit='cover';
+  const im=new Image();im.src='intro_trx2_end.jpg';im.alt='';im.style.objectFit='fill';m.appendChild(im);
+  m.style.overflow='visible';
+  // the video's last frame (16:9) holds the stage photo at a known spot; fly that frame so the photo lands exactly on the stage
+  const PH={l:4/480,t:-4/270,w:429/480};               // photo box inside the 16:9 frame, measured from the render
+  const vw=innerWidth,vh=innerHeight,ar=16/9,coverW=vw/vh>=1.5;
+  let w0,h0;if(coverW?vw/vh>ar:vw/vh<ar){w0=vw;h0=vw/ar;}else{h0=vh;w0=vh*ar;}
+  const start={left:(vw-w0)/2+'px',top:(vh-h0)/2+'px',width:w0+'px',height:h0+'px',clipPath:'inset(0px 0px 0px 0px round 0px)'};
   Object.assign(m.style,start);
   document.body.appendChild(m);
   root.classList.add('morphing','settle');
   root.classList.remove('intro-on');                 // page chrome starts settling in under the flying photo
   intro.style.opacity='0';
   const r=stageEl.getBoundingClientRect();
-  const end={left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px',borderRadius:getComputedStyle(stageEl).borderRadius};
+  const FW=r.width/PH.w,FH=FW/ar,FL=r.left-PH.l*FW,FT=r.top-PH.t*FH,rad=parseFloat(getComputedStyle(stageEl).borderTopLeftRadius)||0;
+  const ci=[Math.max(0,r.top-FT),Math.max(0,FL+FW-(r.left+r.width)),Math.max(0,FT+FH-(r.top+r.height)),Math.max(0,r.left-FL)];
+  const end={left:FL+'px',top:FT+'px',width:FW+'px',height:FH+'px',clipPath:`inset(${ci[0]}px ${ci[1]}px ${ci[2]}px ${ci[3]}px round ${rad}px)`};
   const anim=m.animate([start,end],
    {duration:900,easing:'cubic-bezier(.65,0,.2,1)',fill:'forwards'});
   const land=()=>{root.classList.remove('morphing');im.style.opacity='0';
@@ -495,7 +500,7 @@ setLang(lang);render(true);
  v.addEventListener('playing',()=>{started=true;});
  const p=v.play();if(p&&p.catch)p.catch(finish);      // autoplay blocked: go straight to the page
  timers.push(setTimeout(()=>{if(!started)finish();},2000));   // slow network: don't keep people waiting
- timers.push(setTimeout(finish,9000));                         // hard stop
+ timers.push(setTimeout(finish,12500));                         // hard stop
 })();
 </script>
 </body>
