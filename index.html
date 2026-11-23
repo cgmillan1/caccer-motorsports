@@ -24,8 +24,8 @@ button{font:inherit;cursor:pointer}
 .wrap{max-width:1240px;margin:0 auto;padding:0 max(4vw,16px)}
 header{background:#0b0c0e;color:#f2f2f0}
 header .wrap{display:flex;align-items:center;gap:20px;min-height:64px;flex-wrap:wrap}
-.logo{font-weight:900;letter-spacing:.02em;font-size:20px;text-decoration:none;display:flex;align-items:center;gap:10px}
-.logo i{width:28px;height:14px;background:var(--red);transform:skewX(-20deg);display:inline-block}
+.logo{text-decoration:none;display:flex;align-items:center;gap:12px;color:inherit}
+.logo img{height:38px;width:auto;display:block}
 .logo small{font-weight:500;color:#a3a7ad;font-size:12px}
 nav{display:flex;gap:18px;margin-left:auto;flex-wrap:wrap;align-items:center}
 nav a{text-decoration:none;color:#d6d7d9;font-size:15px}
@@ -59,6 +59,8 @@ nav a:hover{color:#fff}
 .arrow.l{left:12px}.arrow.r{right:12px}
 .stage.int .arrow{display:none}
 .dots{position:absolute;right:18px;bottom:24px;display:flex;gap:6px}
+.wm{position:absolute;right:16px;bottom:40px;width:clamp(96px,14%,150px);height:auto;z-index:2;pointer-events:none;filter:drop-shadow(0 2px 8px rgba(0,0,0,.55))}
+.stage.int .wm{opacity:.9}
 .dots i{width:22px;height:4px;border-radius:2px;background:rgba(255,255,255,.35)}
 .dots i.on{background:var(--red)}
 .hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(10,11,12,.72);padding:10px 16px;border-radius:999px;font:600 14px 'Archivo Narrow';color:#fff;pointer-events:none;transition:opacity .5s}
@@ -169,7 +171,7 @@ footer{padding:28px 0 40px;color:var(--mute);font-size:14px}
  .visit{grid-template-columns:1fr}
  .lb figure{padding:0 8px}.lb .nav{top:auto;bottom:-52px}
 }
-@media(max-width:600px){.logo small{display:none}.mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;background:#0b0c0e;color:#fff;padding:10px 14px calc(10px + env(safe-area-inset-bottom));gap:12px;align-items:center;justify-content:space-between;box-shadow:0 -6px 20px rgba(0,0,0,.35)}
+@media(max-width:600px){.logo small{display:none}.logo img{height:28px}.wm{display:none}.mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;background:#0b0c0e;color:#fff;padding:10px 14px calc(10px + env(safe-area-inset-bottom));gap:12px;align-items:center;justify-content:space-between;box-shadow:0 -6px 20px rgba(0,0,0,.35)}
 .mbar b{display:block;font-size:14px;line-height:1.2}.mbar span{font:700 17px 'Archivo Narrow';color:#ff5a4f}.mbar .btn{flex:none}footer{padding-bottom:110px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
@@ -181,8 +183,8 @@ html.intro-on{overflow:hidden}
 .intro .ibg{filter:blur(28px) brightness(.45);transform:scale(1.1);opacity:0;transition:opacity 1.8s ease}
 .intro.lit .ibg{opacity:1}
 @media(max-aspect-ratio:3/2){.intro video,.imorph img{object-fit:contain}}
-.ibrand{position:absolute;left:max(4vw,16px);bottom:max(5vh,20px);display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.02em;font-size:clamp(16px,1.6vw,22px);color:#f2f2f0;opacity:0;transform:translateY(8px);transition:opacity .8s ease,transform .8s ease}
-.ibrand i{width:28px;height:14px;background:var(--red);transform:skewX(-20deg)}
+.ibrand{position:absolute;right:max(3vw,16px);bottom:max(4vh,18px);display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.02em;font-size:clamp(16px,1.6vw,22px);color:#f2f2f0;opacity:0;transform:translateY(8px);transition:opacity .8s ease,transform .8s ease}
+.ibrand img{width:clamp(150px,18vw,300px);height:auto;display:block;filter:drop-shadow(0 4px 14px rgba(0,0,0,.6))}
 .intro.lit2 .ibrand{opacity:1;transform:none}
 .iskip{position:absolute;top:max(2vh,12px);right:max(2vw,12px);background:rgba(20,21,24,.6);color:#f2f2f0;border:1px solid #3a3d42;border-radius:999px;padding:8px 16px;min-height:40px;font:600 14px 'Archivo Narrow';backdrop-filter:blur(6px)}
 .iskip:hover{background:rgba(20,21,24,.85)}
@@ -190,12 +192,12 @@ html.intro-on{overflow:hidden}
 .imorph img{transition:opacity .25s ease}
 /* page chrome waits off-stage while the intro plays */
 html.intro-on header,html.intro-on .sticker,html.intro-on .lineup,html.intro-on .mbar,
-html.intro-on .stage .title,html.intro-on .stage .tools,html.intro-on .stage .dots,html.intro-on .stage .arrow,html.intro-on .stage .hint,html.intro-on #hsLayer{opacity:0;transform:translateY(14px)}
+html.intro-on .stage .title,html.intro-on .stage .wm,html.intro-on .stage .tools,html.intro-on .stage .dots,html.intro-on .stage .arrow,html.intro-on .stage .hint,html.intro-on #hsLayer{opacity:0;transform:translateY(14px)}
 html.intro-on .sticker{transform:translateX(28px)}
 html.intro-on header{transform:translateY(-12px)}
 html.intro-on .frames,html.morphing .frames{opacity:0}
 html.settle header,html.settle .sticker,html.settle .lineup,html.settle .mbar,
-html.settle .stage .title,html.settle .stage .tools,html.settle .stage .dots,html.settle .stage .arrow,html.settle .stage .hint,html.settle #hsLayer{transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+html.settle .stage .title,html.settle .stage .wm,html.settle .stage .tools,html.settle .stage .dots,html.settle .stage .arrow,html.settle .stage .hint,html.settle #hsLayer{transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
 html.settle header{transition-delay:.15s}
 html.settle .stage .title{transition-delay:.45s}
 html.settle .stage .tools,html.settle .stage .dots,html.settle .stage .arrow,html.settle #hsLayer{transition-delay:.6s}
@@ -208,7 +210,7 @@ html.settle .stage .hint{transition-delay:.9s}
 <div class="intro" id="intro" aria-hidden="true">
  <img class="ibg" src="img/trx_01.jpg" alt="">
  <video id="introV" muted playsinline preload="auto" poster="intro_trx_start.jpg"><source src="intro_trx.mp4" type="video/mp4"></video>
- <div class="ibrand"><i></i>CACCER MOTORSPORTS</div>
+ <div class="ibrand"><img src="img/caccer_logo.png" alt="Caccer Motorsports"></div>
  <button class="iskip" id="introSkip" data-es="Saltar intro" data-en="Skip intro">Saltar intro</button>
 </div>
 <script>
@@ -221,7 +223,7 @@ html.settle .stage .hint{transition-delay:.9s}
  else{var el=document.getElementById('intro');el.parentNode.removeChild(el);}})();
 </script>
 <header><div class="wrap">
- <a class="logo" href="#inventario"><i></i>CACCER MOTORSPORTS<small>West Jordan, UT</small></a>
+ <a class="logo" href="#inventario" aria-label="Caccer Motorsports"><img src="img/caccer_logo.png" alt="Caccer Motorsports" width="244" height="38"><small>West Jordan, UT</small></a>
  <nav>
   <a href="#inventario" data-es="Inventario" data-en="Inventory">Inventario</a>
   <a href="#visitar" data-es="Visitanos" data-en="Visit us">Visitanos</a>
@@ -243,6 +245,7 @@ html.settle .stage .hint{transition-delay:.9s}
     <button id="tInt" aria-pressed="false" data-es="Interior" data-en="Interior">Interior</button>
     <button id="tspin" aria-pressed="false" data-es="Girar" data-en="Spin">Girar</button>
    </div>
+   <img class="wm" src="img/caccer_logo.png" alt="" aria-hidden="true">
    <div class="dots" id="dots"></div>
    <div class="hint" id="hint" data-es="Arrastrá para girar el auto" data-en="Drag to turn the car">Arrastrá para girar el auto</div>
   </div>
@@ -283,7 +286,7 @@ html.settle .stage .hint{transition-delay:.9s}
   <button class="btn red" data-msg="cita">@caccer.motorsports</button>
  </div>
 </div></section>
-<footer><div class="wrap">Caccer Motorsports® · West Jordan, UT · <span data-es="Todas las fotos son del vehículo real a la venta." data-en="Every photo shows the actual vehicle for sale.">Todas las fotos son del vehículo real a la venta.</span></div></footer>
+<footer><div class="wrap"><img src="img/caccer_logo.png" alt="Caccer Motorsports" style="height:30px;width:auto;display:block;margin-bottom:10px">Caccer Motorsports® · West Jordan, UT · <span data-es="Todas las fotos son del vehículo real a la venta." data-en="Every photo shows the actual vehicle for sale.">Todas las fotos son del vehículo real a la venta.</span></div></footer>
 
 <div class="mbar" id="mbar"><div><b id="mbName"></b><span id="mbPrice"></span></div><button class="btn red" data-msg="interes" data-es="Escribir a Santi" data-en="Message Santi">Escribir a Santi</button></div>
 <div class="md" id="md" role="dialog" aria-modal="true" aria-labelledby="mdT"><div class="mdbox">
