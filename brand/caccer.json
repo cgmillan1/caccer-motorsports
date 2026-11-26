@@ -1,0 +1,33 @@
+{
+  "name": "Caccer Motorsports",
+  "short": "Caccer",
+  "key": "caccer",
+  "initials": "CM",
+  "lang": "es",
+  "tagline": {
+    "es": "Autos seleccionados en West Jordan, UT",
+    "en": "Hand-picked cars in West Jordan, UT"
+  },
+  "colors": {
+    "primary": "#c8102e",
+    "accent": "#ffd23f",
+    "ink": "#111113",
+    "bg": "#ffffff",
+    "soft": "#f3f4f6",
+    "dark": "#0b0b0d"
+  },
+  "fonts": {
+    "heading": "Archivo",
+    "body": "Archivo",
+    "source": "google"
+  },
+  "icons": "tabler",
+  "contact": [
+    "West Jordan, UT",
+    "@caccer.motorsports"
+  ],
+  "voice": "confident, direct, no pressure; no financing language",
+  "style_notes": "Bold and dark: big real car photos, black and red from the logo, yellow only for small badges, wide bold headings, Archivo Narrow for labels and specs.",
+  "status": "proposed",
+  "logo": "logo.png"
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Caccer Motorsports",
+  "short": "Caccer",
+  "initials": "CM",
+  "tagline": "Autos seleccionados en West Jordan, UT",
+  "accent": "#c8102e",
+  "accent2": "#ffd23f",
+  "ink": "#111113",
+  "soft": "#f3f4f6",
+  "headings": "sans",
+  "lang": "es",
+  "contact": [
+    "West Jordan, UT",
+    "@caccer.motorsports"
+  ],
+  "footer_note": "",
+  "logo": "logo.png",
+  "fonts_dir": "fonts",
+  "heading_font": "Archivo",
+  "body_font": "Archivo"
+}

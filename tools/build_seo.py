@@ -93,7 +93,7 @@ def og_image(c):
     pf = f900(64)
     pw = pf.getlength(pr)
     bx = W - 48 - pw - 40
-    d.rounded_rectangle([bx, H - 128, W - 48, H - 40], 14, fill=(227, 36, 27))
+    d.rounded_rectangle([bx, H - 128, W - 48, H - 40], 14, fill=(200, 16, 46))
     d.text((bx + 20, H - 122), pr, font=pf, fill=(255, 255, 255))
     lg = logo.copy()
     lg.thumbnail((260, 60))
@@ -121,12 +121,12 @@ for c in cars:
         '{{LD}}': json.dumps(car_ld(c, url), ensure_ascii=False) + '</script>\n<script type="application/ld+json">' + json.dumps(crumbs, ensure_ascii=False),
         '{{ID}}': c['id'], '{{YM}}': esc(f"{c['year']} {c['make']}"), '{{NAME}}': esc(c['name']), '{{FULL}}': esc(full(c)),
         '{{PRICE}}': money(c['price']), '{{CARJSON}}': json.dumps({k: c[k] for k in ('id', 'year', 'make', 'name', 'price', 'specs', 'chips', 'feat')}, ensure_ascii=False),
-        '{{HERO}}': ''.join(f'<img src="../../img/{p}.jpg" alt="{esc(full(c))}, photo {i + 1}" {"" if i == 0 else "loading=\"lazy\" "}width="1344" height="896">' for i, p in enumerate(photos)),
+        '{{HERO}}': ''.join(f'<img src="../../img/w/{p}.webp" srcset="../../img/s/{p}.webp 720w, ../../img/w/{p}.webp 1344w" sizes="(max-width: 700px) 92vw, 690px" alt="{esc(full(c))}, photo {i + 1}" {"fetchpriority=\"high\" " if i == 0 else "loading=\"lazy\" "}width="1344" height="896">' for i, p in enumerate(photos)),
         '{{NPH}}': str(len(photos)),
         '{{SPECS}}': ''.join(f'<div><dt>{esc(k)}</dt><dd>{esc(v)}</dd></div>' for k, v in c['specs']['en']),
         '{{CHIPS}}': ''.join(f'<li>{esc(t)}</li>' for t in c['chips']['en']),
         '{{FEAT}}': ''.join(f'<li>{esc(t)}</li>' for t in c['feat']['en']),
-        '{{OTHERS}}': ''.join(f'<a class="oc" href="../{o["id"]}/"><img src="../../img/{o["photos"]["ext"][0]}.jpg" alt="{esc(full(o))}" loading="lazy"><span><small>{o["year"]} {esc(o["make"])}</small><b>{esc(o["name"])}</b><em>{money(o["price"])}</em></span></a>' for o in others),
+        '{{OTHERS}}': ''.join(f'<a class="oc" href="../{o["id"]}/"><img src="../../{('img/cut/' + o['photos']['ext'][0] + '_s.webp') if os.path.exists('img/cut/' + o['photos']['ext'][0] + '_s.webp') else ('img/s/' + o['photos']['ext'][0] + '.webp')}" alt="{esc(full(o))}" loading="lazy" width="720" height="480"><span><small>{o["year"]} {esc(o["make"])}</small><b>{esc(o["name"])}</b><em>{money(o["price"])}</em></span></a>' for o in others),
     }
     out = PAGE
     for k, v in rep.items():
